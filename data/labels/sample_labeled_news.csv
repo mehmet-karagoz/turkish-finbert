@@ -1,0 +1,17 @@
+date,ticker,source,title,text,url,label
+2024-01-02,THYAO,KAP,Yolcu sayısında artış,Şirket aylık trafik sonuçlarında yolcu sayısı ve doluluk oranında güçlü artış açıkladı.,https://example.com/thyao-1,positive
+2024-01-03,ASELS,KAP,Yeni sözleşme imzalandı,Şirket yurt dışı müşteriyle yüksek tutarlı savunma elektroniği sözleşmesi imzaladı.,https://example.com/asels-1,positive
+2024-01-04,GARAN,Haber,Banka kar beklentisini korudu,Banka yönetimi yıl sonu özkaynak karlılığı beklentisinde önemli değişiklik olmadığını belirtti.,https://example.com/garan-1,neutral
+2024-01-05,EREGL,Haber,Marj baskısı devam ediyor,Çelik fiyatlarındaki zayıflık ve maliyet baskısı şirket karlılığı üzerinde risk oluşturuyor.,https://example.com/eregl-1,negative
+2024-01-08,SISE,KAP,Yatırım planı açıklandı,Şirket üretim kapasitesini artıracak yeni yatırım için yönetim kurulu kararı aldı.,https://example.com/sise-1,positive
+2024-01-09,AKBNK,Haber,Sermaye yeterliliği stabil,Bankanın sermaye yeterlilik oranı önceki çeyreğe yakın seviyede gerçekleşti.,https://example.com/akbnk-1,neutral
+2024-01-10,KOZAL,Haber,Üretimde düşüş,Şirket maden sahasındaki geçici sorun nedeniyle üretim hacminde düşüş beklediğini duyurdu.,https://example.com/kozal-1,negative
+2024-01-11,BIMAS,KAP,Mağaza açılışları sürüyor,Perakende şirketi yılın ilk döneminde planlanan mağaza açılışlarının sürdüğünü bildirdi.,https://example.com/bimas-1,neutral
+2024-01-12,TUPRS,Haber,Rafineri marjları güçlendi,Rafineri marjlarındaki toparlanma şirketin operasyonel karlılığı için olumlu sinyal verdi.,https://example.com/tuprs-1,positive
+2024-01-15,KCHOL,Haber,Portföy değeri yatay,Sektörlerdeki karışık görünüm nedeniyle holding net aktif değerinde sınırlı değişim bekleniyor.,https://example.com/kchol-1,neutral
+2024-01-16,THYAO,Haber,Yakıt maliyeti riski,Petrol fiyatlarındaki yükseliş havayolu şirketinin maliyet görünümü için baskı yaratabilir.,https://example.com/thyao-2,negative
+2024-01-17,ASELS,KAP,Teslimat takvimi güncellendi,Şirket mevcut sözleşmede teslimat takviminin müşteri talebiyle güncellendiğini açıkladı.,https://example.com/asels-2,neutral
+2024-01-18,GARAN,Haber,Net kar beklentiyi aştı,Banka çeyreklik net karında piyasa beklentisinin üzerinde sonuç açıkladı.,https://example.com/garan-2,positive
+2024-01-19,EREGL,Haber,Zayıf talep görünümü,İhracat pazarlarında talep zayıf seyrederken satış hacmi üzerinde aşağı yönlü risk oluştu.,https://example.com/eregl-2,negative
+2024-01-22,SISE,KAP,Doğal gaz maliyeti arttı,Enerji maliyetlerindeki yükseliş cam üretim marjlarını kısa vadede olumsuz etkileyebilir.,https://example.com/sise-2,negative
+

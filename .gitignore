@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+models/*.joblib
+models/*/
+reports/*.csv
+reports/*.json
+reports/figures/*.png
+data/raw/prices.csv
+data/processed/*.csv

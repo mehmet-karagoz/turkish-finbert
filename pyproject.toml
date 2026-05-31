@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "turkish-fin-bert"
+version = "0.1.0"
+description = "BIST hisseleri için Türkçe finansal duygu analizi ve basit sinyal/backtest hattı."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "joblib>=1.3",
+    "matplotlib>=3.8",
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scikit-learn>=1.4",
+    "seaborn>=0.13",
+    "yfinance>=0.2",
+]
+
+[project.optional-dependencies]
+nlp = [
+    "torch>=2.2",
+    "transformers>=4.40",
+]
+portfolio = [
+    "PyPortfolioOpt>=1.5",
+]
+dev = [
+    "pytest>=8.0",
+]
+
+[project.scripts]
+fetch_data = "turkish_fin_bert.fetch_data:main"
+prepare_dataset = "turkish_fin_bert.prepare_dataset:main"
+train_model = "turkish_fin_bert.train_model:main"
+train_transformer = "turkish_fin_bert.train_transformer:main"
+score_news = "turkish_fin_bert.score_news:main"
+analyze_financial_effect = "turkish_fin_bert.financial_effect:main"
+backtest = "turkish_fin_bert.backtest:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
