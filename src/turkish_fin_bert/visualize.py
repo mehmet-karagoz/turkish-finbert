@@ -58,6 +58,21 @@ def plot_source_counts(df: pd.DataFrame, out: Path) -> None:
     _save_current(out)
 
 
+def plot_ticker_counts(df: pd.DataFrame, out: Path) -> None:
+    if "ticker" not in df:
+        return
+    counts = df["ticker"].fillna("").astype(str).str.strip()
+    counts = counts[counts.ne("")]
+    if counts.empty:
+        return
+    plt.figure(figsize=(9, 4))
+    counts.value_counts().head(20).plot(kind="bar")
+    plt.title("Hisse bazlı metin sayısı")
+    plt.xlabel("Hisse")
+    plt.ylabel("Metin sayısı")
+    _save_current(out)
+
+
 def plot_daily_counts(df: pd.DataFrame, out: Path) -> None:
     if "date" not in df:
         return
@@ -169,4 +184,3 @@ def plot_drawdown(df: pd.DataFrame, out: Path) -> None:
     plt.xlabel("Tarih")
     plt.ylabel("Drawdown")
     _save_current(out)
-

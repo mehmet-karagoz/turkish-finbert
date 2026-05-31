@@ -55,7 +55,36 @@ uv run audit_aliases --input data/raw/news_all.csv --out-unmatched reports/unmat
 
 Not: KAP'ın resmi yüksek yoğunluklu REST veri yayın servisi sözleşme, IP yetkilendirme ve API key gerektirir. Bu yüzden bu proje ilk adımda RSS ve KAP bildirim URL'lerinden metin toplamayı destekler.
 
-## 2. Örnek Etiketli Veri Hazırlama
+## 2. Gerçek Haberleri Etiketleme Havuzuna Çevirme
+
+Toplanan gerçek haberlerden manuel etiketleme için CSV üretmek:
+
+```powershell
+uv run create_labeling_batch --input data/processed/real_scored_news.csv --output data/labels/real_labeling_batch.csv --max-rows 300 --per-ticker 20
+```
+
+Model tahminlerini yardımcı kolon olarak görmek istersen:
+
+```powershell
+uv run create_labeling_batch --input data/processed/real_scored_news.csv --output data/labels/real_labeling_batch.csv --max-rows 300 --per-ticker 20 --include-model-hints
+```
+
+Etiketleme kuralı: `label` kolonuna sadece `negative`, `neutral` veya `positive` yazılır. Yatırımcı açısından şirket değeri/hisse beklentisi için olumlu metinler `positive`, olumsuz metinler `negative`, net yön taşımayanlar `neutral` olmalı.
+
+Etiketleri kontrol etmek için:
+
+```powershell
+uv run create_labeling_batch --input data/labels/real_labeling_batch.csv --validate-only
+```
+
+Üretilen grafikler:
+
+- `reports/figures/labeling_text_length_distribution.png`: Etiketlenecek metinlerin yeterli bilgi taşıyıp taşımadığını gösterir.
+- `reports/figures/labeling_daily_text_counts.png`: Etiket havuzunun hangi günlerde yoğunlaştığını gösterir.
+- `reports/figures/labeling_source_distribution.png`: Haber kaynaklarının dağılımını gösterir.
+- `reports/figures/labeling_ticker_distribution.png`: Etiketlenecek haberlerin hisselere göre dengesini gösterir.
+
+## 3. Örnek Etiketli Veri Hazırlama
 
 ```powershell
 uv run prepare_dataset --input data/labels/sample_labeled_news.csv --output data/processed/labeled_news.csv --labeled
@@ -73,7 +102,13 @@ Gerçek haberleri model girdisine hazırlamak için:
 uv run prepare_dataset --input data/raw/news.csv --output data/processed/news_prepared.csv
 ```
 
-## 3. Baseline Model Eğitimi
+Gerçek etiketli CSV hazır olduğunda:
+
+```powershell
+uv run prepare_dataset --input data/labels/real_labeling_batch.csv --output data/processed/real_labeled_news.csv --labeled
+```
+
+## 4. Baseline Model Eğitimi
 
 ```powershell
 uv run train_model --input data/processed/labeled_news.csv --model-out models/baseline_sentiment.joblib --report-dir reports
@@ -84,7 +119,7 @@ uv run train_model --input data/processed/labeled_news.csv --model-out models/ba
 - `reports/figures/confusion_matrix.png`: Modelin hangi sınıfları karıştırdığını gösterir.
 - `reports/figures/class_scores.png`: Sınıf bazlı precision/recall/F1 skorlarını gösterir.
 
-## 4. Haberleri Skorlama
+## 5. Haberleri Skorlama
 
 ```powershell
 uv run score_news --model models/baseline_sentiment.joblib --input data/processed/labeled_news.csv --out data/processed/scored_news.csv --daily-out data/processed/daily_sentiment.csv
@@ -95,7 +130,7 @@ uv run score_news --model models/baseline_sentiment.joblib --input data/processe
 - `prob_positive - prob_negative` değeri günlük sentiment skorudur.
 - `sentiment_3d`, `sentiment_7d`, `sentiment_14d` kolonları hisse bazlı hareketli ortalamalardır.
 
-## 5. Fiyat Verisi Çekme
+## 6. Fiyat Verisi Çekme
 
 ```powershell
 uv run fetch_data --tickers THYAO ASELS GARAN --start 2022-01-01 --out data/raw/prices.csv
@@ -103,7 +138,7 @@ uv run fetch_data --tickers THYAO ASELS GARAN --start 2022-01-01 --out data/raw/
 
 Not: BIST sembollerine otomatik `.IS` eki eklenir.
 
-## 6. Finansal Etki Analizi
+## 7. Finansal Etki Analizi
 
 ```powershell
 uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --out reports/financial_effect.csv
@@ -115,7 +150,7 @@ uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv -
 - `reports/figures/sentiment_return_correlation.png`: Sentiment ile 1/5/20 günlük ileri getiriler arasındaki ilişkiyi gösterir.
 - `reports/figures/price_sentiment_<TICKER>.png`: Hisse fiyatı ile sentiment skorunu birlikte gösterir.
 
-## 7. Basit Backtest
+## 8. Basit Backtest
 
 ```powershell
 uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --top-n 5 --rebalance-months 3 --out reports/backtest_equity.csv
@@ -126,7 +161,7 @@ uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw
 - `reports/figures/backtest_equity.png`: Strateji ile eşit ağırlıklı benchmark kümülatif getirisi.
 - `reports/figures/backtest_drawdown.png`: Stratejinin maksimum düşüş dönemleri.
 
-## 8. Opsiyonel BERT Fine-Tuning
+## 9. Opsiyonel BERT Fine-Tuning
 
 ```powershell
 uv run train_transformer --input data/processed/labeled_news.csv --model-name dbmdz/bert-base-turkish-cased --output-dir models/berturk_sentiment
