@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Örnek BIST Haberleri</title>
+    <item>
+      <title>THYAO yolcu trafiğinde güçlü artış açıkladı</title>
+      <link>https://example.com/thyao-trafik</link>
+      <pubDate>Tue, 02 Jan 2024 09:00:00 +0300</pubDate>
+      <description>THYAO aylık trafik verilerinde yolcu sayısı ve doluluk oranında artış bildirdi.</description>
+    </item>
+    <item>
+      <title>ASELS yeni yurt dışı sözleşme imzaladı</title>
+      <link>https://example.com/asels-sozlesme</link>
+      <pubDate>Wed, 03 Jan 2024 10:30:00 +0300</pubDate>
+      <description>ASELS yüksek tutarlı savunma elektroniği sözleşmesi için KAP açıklaması yaptı.</description>
+    </item>
+    <item>
+      <title>EREGL marj baskısının sürdüğünü değerlendirdi</title>
+      <link>https://example.com/eregl-marj</link>
+      <pubDate>Fri, 05 Jan 2024 11:15:00 +0300</pubDate>
+      <description>EREGL için zayıf çelik fiyatları ve maliyet baskısı karlılık üzerinde risk oluşturuyor.</description>
+    </item>
+  </channel>
+</rss>
+

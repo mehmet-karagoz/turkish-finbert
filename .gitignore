@@ -10,4 +10,6 @@ reports/*.csv
 reports/*.json
 reports/figures/*.png
 data/raw/prices.csv
+data/raw/news.csv
+data/raw/kap_news.csv
 data/processed/*.csv
