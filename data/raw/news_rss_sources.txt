@@ -1,0 +1,6 @@
+# Investing.com Türkiye RSS kaynakları
+# Kaynak sayfası: https://tr.investing.com/webmaster-tools/rss
+https://tr.investing.com/rss/news_1067.rss
+https://tr.investing.com/rss/news_356.rss
+https://tr.investing.com/rss/news_25.rss
+https://tr.investing.com/rss/news_14.rss

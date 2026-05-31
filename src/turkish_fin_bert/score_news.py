@@ -25,7 +25,7 @@ def score_news(model_path: Path, input_csv: Path, out_csv: Path, daily_out_csv: 
     df = pd.read_csv(input_csv)
     df = _ensure_text(df)
     df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.date
-    df["ticker"] = df["ticker"].astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
+    df["ticker"] = df["ticker"].fillna("").astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
 
     proba = model.predict_proba(df["text"])
     classes = list(model.classes_)
@@ -42,6 +42,7 @@ def score_news(model_path: Path, input_csv: Path, out_csv: Path, daily_out_csv: 
 
     daily = (
         df.dropna(subset=["date", "ticker"])
+        .loc[lambda data: data["ticker"].ne("")]
         .groupby(["date", "ticker"], as_index=False)
         .agg(
             sentiment_score=("sentiment_score", "mean"),

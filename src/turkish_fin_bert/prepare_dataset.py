@@ -21,7 +21,7 @@ def prepare_dataset(input_csv: Path, output_csv: Path, labeled: bool = False, mi
         raise ValueError(f"Eksik kolonlar: {sorted(missing)}")
 
     df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.date
-    df["ticker"] = df["ticker"].astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
+    df["ticker"] = df["ticker"].fillna("").astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
     df["title"] = df["title"].map(clean_text)
     df["text"] = [combine_title_text(title, text) for title, text in zip(df["title"], df["text"])]
     df["source"] = df["source"].fillna("unknown").map(clean_text)

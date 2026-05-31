@@ -15,8 +15,8 @@ def load_prices(path: Path) -> pd.DataFrame:
     if missing:
         raise ValueError(f"Fiyat CSV içinde eksik kolonlar: {sorted(missing)}")
     prices["date"] = pd.to_datetime(prices["date"], errors="coerce")
-    prices["ticker"] = prices["ticker"].astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
-    return prices.dropna(subset=["date", "ticker", "close"]).sort_values(["ticker", "date"])
+    prices["ticker"] = prices["ticker"].fillna("").astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
+    return prices.dropna(subset=["date", "ticker", "close"]).loc[lambda data: data["ticker"].ne("")].sort_values(["ticker", "date"])
 
 
 def add_forward_returns(prices: pd.DataFrame) -> pd.DataFrame:
@@ -29,7 +29,8 @@ def add_forward_returns(prices: pd.DataFrame) -> pd.DataFrame:
 def analyze_effect(sentiment_csv: Path, prices_csv: Path, out_csv: Path) -> pd.DataFrame:
     sentiment = pd.read_csv(sentiment_csv)
     sentiment["date"] = pd.to_datetime(sentiment["date"], errors="coerce")
-    sentiment["ticker"] = sentiment["ticker"].astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
+    sentiment["ticker"] = sentiment["ticker"].fillna("").astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
+    sentiment = sentiment[sentiment["ticker"].ne("")]
 
     prices = add_forward_returns(load_prices(prices_csv))
     merged = sentiment.merge(prices, on=["date", "ticker"], how="inner")

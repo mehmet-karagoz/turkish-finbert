@@ -253,6 +253,20 @@ def read_url_list(path: Path) -> list[str]:
     return urls
 
 
+def read_ticker_file(path: Path) -> list[str]:
+    tickers: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        value = line.strip()
+        if not value or value.startswith("#"):
+            continue
+        tickers.extend(part.strip() for part in re.split(r"[,;\s]+", value) if part.strip())
+    return tickers
+
+
+def normalize_tickers(tickers: list[str]) -> list[str]:
+    return sorted({ticker.upper().replace(".IS", "").strip() for ticker in tickers if ticker.strip()})
+
+
 def load_existing(path: Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame(columns=NEWS_COLUMNS)
@@ -275,7 +289,12 @@ def save_news(df: pd.DataFrame, out_csv: Path, append: bool) -> pd.DataFrame:
 
 def fetch_rss_sources(args: argparse.Namespace) -> list[NewsItem]:
     items: list[NewsItem] = []
-    for source in args.rss_url or []:
+    rss_sources: list[str] = []
+    rss_sources.extend(args.rss_url or [])
+    for path in args.rss_url_file or []:
+        rss_sources.extend(read_url_list(path))
+
+    for source in rss_sources:
         feed_xml = read_text_source(source)
         items.extend(parse_feed_items(feed_xml, source_name=urlparse(source).netloc or "rss"))
     for source in args.rss_file or []:
@@ -296,6 +315,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Gerçek haber/KAP metinlerini standart haber CSV şemasına toplar.")
     parser.add_argument("--source", choices=["rss", "urls", "kap-links"], required=True, help="Toplanacak kaynak tipi.")
     parser.add_argument("--tickers", nargs="*", default=[], help="Aranacak BIST sembolleri: THYAO ASELS GARAN")
+    parser.add_argument("--tickers-file", action="append", type=Path, help="Satır satır veya virgülle ayrılmış BIST sembolleri dosyası.")
     parser.add_argument("--aliases", type=Path, default=None, help="ticker,alias kolonlu şirket adı eşleştirme CSV'si.")
     parser.add_argument("--out", type=Path, default=Path("data/raw/news.csv"), help="Haber çıktı CSV yolu.")
     parser.add_argument("--append", action="store_true", help="Var olan CSV üzerine ekle ve tekrarları sil.")
@@ -304,6 +324,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--limit", type=int, default=0, help="Kaydedilecek maksimum haber sayısı. 0 sınırsız.")
 
     parser.add_argument("--rss-url", action="append", help="RSS/Atom URL. Birden fazla kez verilebilir.")
+    parser.add_argument("--rss-url-file", action="append", type=Path, help="Satır satır RSS/Atom URL içeren dosya.")
     parser.add_argument("--rss-file", action="append", help="Yerel RSS/Atom XML dosyası. Test ve arşiv için kullanışlı.")
     parser.add_argument("--url", action="append", help="Doğrudan haber veya KAP bildirim URL'si.")
     parser.add_argument("--url-file", action="append", type=Path, help="Satır satır URL içeren dosya.")
@@ -315,6 +336,10 @@ def main() -> None:
     ensure_project_dirs()
     args = build_parser().parse_args()
     aliases = load_aliases(args.aliases)
+    tickers = list(args.tickers or [])
+    for path in args.tickers_file or []:
+        tickers.extend(read_ticker_file(path))
+    tickers = normalize_tickers(tickers)
 
     if args.source == "rss":
         items = fetch_rss_sources(args)
@@ -325,11 +350,10 @@ def main() -> None:
 
     if args.limit:
         items = items[: args.limit]
-    df = rows_from_items(items, args.tickers, aliases, args.include_untagged, args.fetch_article_text)
+    df = rows_from_items(items, tickers, aliases, args.include_untagged, args.fetch_article_text)
     saved = save_news(df, args.out, append=args.append)
     print(f"{len(df)} yeni satır hazırlandı. Toplam {len(saved)} satır kaydedildi: {args.out}")
 
 
 if __name__ == "__main__":
     main()
-

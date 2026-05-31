@@ -25,8 +25,9 @@ def _rebalance_dates(dates: pd.Series, months: int) -> list[pd.Timestamp]:
 def run_backtest(sentiment_csv: Path, prices_csv: Path, top_n: int, rebalance_months: int, out_csv: Path) -> pd.DataFrame:
     sentiment = pd.read_csv(sentiment_csv)
     sentiment["date"] = pd.to_datetime(sentiment["date"], errors="coerce")
-    sentiment["ticker"] = sentiment["ticker"].astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
+    sentiment["ticker"] = sentiment["ticker"].fillna("").astype(str).str.upper().str.replace(".IS", "", regex=False).str.strip()
     sentiment = sentiment.dropna(subset=["date", "ticker", "sentiment_score"]).sort_values(["ticker", "date"])
+    sentiment = sentiment[sentiment["ticker"].ne("")]
 
     prices = load_prices(prices_csv)
     prices["return"] = prices.groupby("ticker")["close"].pct_change().fillna(0.0)

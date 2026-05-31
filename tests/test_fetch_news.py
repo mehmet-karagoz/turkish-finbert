@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from turkish_fin_bert.fetch_news import detect_tickers, parse_feed_items, rows_from_items
+from turkish_fin_bert.fetch_news import detect_tickers, normalize_tickers, parse_feed_items, read_ticker_file, rows_from_items
 
 
 def test_detect_tickers_matches_symbol_and_alias():
@@ -23,3 +23,8 @@ def test_rows_from_items_creates_one_row_per_matched_ticker():
     assert df["ticker"].tolist() == ["THYAO", "ASELS"]
     assert set(["date", "ticker", "source", "title", "text", "url"]).issubset(df.columns)
 
+
+def test_read_ticker_file_supports_lines_and_commas(tmp_path):
+    path = tmp_path / "tickers.txt"
+    path.write_text("# yorum\nTHYAO, ASELS\nGARAN.IS\n", encoding="utf-8")
+    assert normalize_tickers(read_ticker_file(path)) == ["ASELS", "GARAN", "THYAO"]

@@ -27,6 +27,12 @@ RSS/Atom kaynağından haberleri standart ham veri şemasına toplamak için:
 uv run fetch_news --source rss --rss-url "https://ORNEK-HABER-SITESI/rss" --tickers THYAO ASELS GARAN EREGL --aliases data/raw/company_aliases.csv --out data/raw/news.csv --append --fetch-article-text
 ```
 
+Projeye eklenmiş gerçek RSS kaynak listesini kullanmak için:
+
+```powershell
+uv run fetch_news --source rss --rss-url-file data/raw/news_rss_sources.txt --tickers-file data/raw/tickers_bist_seed.txt --aliases data/raw/company_aliases.csv --out data/raw/news.csv --append --limit 100
+```
+
 Yerel örnek RSS dosyasıyla internet kullanmadan test etmek için:
 
 ```powershell
