@@ -47,6 +47,12 @@ uv run fetch_news --source kap-links --url-file data/raw/kap_links.txt --tickers
 
 Çıktı şeması: `date`, `ticker`, `source`, `title`, `text`, `url`, `language`, `published_at`.
 
+Ticker eşleşme kalitesini kontrol etmek için:
+
+```powershell
+uv run audit_aliases --input data/raw/news_all.csv --out-unmatched reports/unmatched_news.csv --out-summary reports/alias_coverage.csv
+```
+
 Not: KAP'ın resmi yüksek yoğunluklu REST veri yayın servisi sözleşme, IP yetkilendirme ve API key gerektirir. Bu yüzden bu proje ilk adımda RSS ve KAP bildirim URL'lerinden metin toplamayı destekler.
 
 ## 2. Örnek Etiketli Veri Hazırlama

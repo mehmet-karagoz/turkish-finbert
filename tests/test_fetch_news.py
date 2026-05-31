@@ -1,12 +1,22 @@
 from pathlib import Path
 
-from turkish_fin_bert.fetch_news import detect_tickers, normalize_tickers, parse_feed_items, read_ticker_file, rows_from_items
+from turkish_fin_bert.fetch_news import detect_tickers, normalize_for_match, normalize_tickers, parse_feed_items, read_ticker_file, rows_from_items
 
 
 def test_detect_tickers_matches_symbol_and_alias():
     aliases = {"THYAO": ["Türk Hava Yolları"], "ASELS": ["Aselsan"]}
     text = "Türk Hava Yolları güçlü trafik açıkladı, ASELS yeni sözleşme aldı."
     assert detect_tickers(text, ["THYAO", "ASELS", "GARAN"], aliases) == ["ASELS", "THYAO"]
+
+
+def test_detect_tickers_is_turkish_character_tolerant():
+    aliases = {"KCHOL": ["Koç Holding"], "AHGAZ": ["Ahlatcı Doğal Gaz"]}
+    text = "Koc Holding kredi notu aldı. Ahlatci Dogal Gaz pay geri alımı yaptı."
+    assert detect_tickers(text, ["KCHOL", "AHGAZ"], aliases) == ["AHGAZ", "KCHOL"]
+
+
+def test_normalize_for_match_handles_turkish_letters():
+    assert normalize_for_match("Şişecam, Koç ve Tüpraş") == "SISECAM KOC VE TUPRAS"
 
 
 def test_parse_feed_items_from_sample_feed():

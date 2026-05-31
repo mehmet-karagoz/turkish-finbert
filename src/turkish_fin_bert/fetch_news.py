@@ -1,6 +1,7 @@
 import argparse
 import csv
 import re
+import unicodedata
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -20,6 +21,28 @@ from .text import clean_text
 
 NEWS_COLUMNS = ["date", "ticker", "source", "title", "text", "url", "language", "published_at"]
 DEFAULT_USER_AGENT = "turkish-fin-bert/0.1 research crawler"
+TURKISH_TRANSLATION = str.maketrans(
+    {
+        "ç": "c",
+        "Ç": "C",
+        "ğ": "g",
+        "Ğ": "G",
+        "ı": "i",
+        "İ": "I",
+        "ö": "o",
+        "Ö": "O",
+        "ş": "s",
+        "Ş": "S",
+        "ü": "u",
+        "Ü": "U",
+        "â": "a",
+        "Â": "A",
+        "î": "i",
+        "Î": "I",
+        "û": "u",
+        "Û": "U",
+    }
+)
 
 
 @dataclass
@@ -185,15 +208,36 @@ def load_aliases(path: Path | None) -> dict[str, list[str]]:
 
 def detect_tickers(text: str, tickers: list[str], aliases: dict[str, list[str]] | None = None) -> list[str]:
     text_upper = text.upper()
+    text_normalized = normalize_for_match(text)
     found: list[str] = []
     aliases = aliases or {}
     for ticker in tickers:
         normalized = ticker.upper().replace(".IS", "")
         ticker_pattern = rf"(?<![A-Z0-9]){re.escape(normalized)}(?:\.IS)?(?![A-Z0-9])"
-        alias_hit = any(alias.upper() in text_upper for alias in aliases.get(normalized, []))
+        alias_hit = any(alias_matches(alias, text_upper, text_normalized) for alias in aliases.get(normalized, []))
         if re.search(ticker_pattern, text_upper) or alias_hit:
             found.append(normalized)
     return sorted(set(found))
+
+
+def normalize_for_match(value: str) -> str:
+    ascii_text = unicodedata.normalize("NFKD", value.translate(TURKISH_TRANSLATION))
+    ascii_text = "".join(char for char in ascii_text if not unicodedata.combining(char))
+    ascii_text = re.sub(r"[^A-Za-z0-9]+", " ", ascii_text)
+    return clean_text(ascii_text).upper()
+
+
+def alias_matches(alias: str, text_upper: str, text_normalized: str) -> bool:
+    alias_clean = clean_text(alias)
+    if not alias_clean:
+        return False
+    alias_upper = alias_clean.upper()
+    alias_normalized = normalize_for_match(alias_clean)
+
+    if len(alias_normalized) <= 4:
+        pattern = rf"(?<![A-Z0-9]){re.escape(alias_normalized)}(?![A-Z0-9])"
+        return bool(re.search(pattern, text_normalized))
+    return alias_upper in text_upper or alias_normalized in text_normalized
 
 
 def rows_from_items(
