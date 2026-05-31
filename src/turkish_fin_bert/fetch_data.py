@@ -12,6 +12,23 @@ def bist_symbol(ticker: str) -> str:
     return ticker if ticker.endswith(".IS") else f"{ticker}.IS"
 
 
+def normalize_price_frame(data: pd.DataFrame, ticker: str) -> pd.DataFrame:
+    data = data.reset_index()
+    normalized_columns: list[str] = []
+    known = {"date", "open", "high", "low", "close", "adj close", "volume"}
+    for col in data.columns:
+        if isinstance(col, tuple):
+            parts = [str(part).strip() for part in col if str(part).strip()]
+            name = next((part for part in parts if part.lower() in known), parts[0] if parts else "")
+        else:
+            name = str(col).strip()
+        normalized_columns.append(name.lower().replace(" ", "_"))
+
+    data.columns = normalized_columns
+    data["ticker"] = ticker.upper().replace(".IS", "")
+    return data
+
+
 def fetch_prices(tickers: list[str], start: str, end: str | None, out_csv: Path) -> pd.DataFrame:
     try:
         import yfinance as yf
@@ -25,9 +42,7 @@ def fetch_prices(tickers: list[str], start: str, end: str | None, out_csv: Path)
         if data.empty:
             print(f"Uyarı: {yf_symbol} için veri bulunamadı.")
             continue
-        data = data.reset_index()
-        data["ticker"] = yf_symbol.replace(".IS", "")
-        data = data.rename(columns={col: col.lower() for col in data.columns})
+        data = normalize_price_frame(data, yf_symbol)
         keep = [col for col in ["date", "ticker", "open", "high", "low", "close", "volume"] if col in data.columns]
         rows.append(data[keep])
 

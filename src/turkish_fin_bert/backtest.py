@@ -13,6 +13,8 @@ def _rebalance_dates(dates: pd.Series, months: int) -> list[pd.Timestamp]:
     unique_dates = sorted(pd.to_datetime(dates.dropna().unique()))
     if not unique_dates:
         return []
+    if months <= 0:
+        return unique_dates
     result = [unique_dates[0]]
     next_date = unique_dates[0] + pd.DateOffset(months=months)
     for date in unique_dates[1:]:
@@ -75,7 +77,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--sentiment", type=Path, required=True, help="Günlük sentiment CSV.")
     parser.add_argument("--prices", type=Path, required=True, help="Fiyat CSV.")
     parser.add_argument("--top-n", type=int, default=5, help="Her rebalance döneminde seçilecek hisse sayısı.")
-    parser.add_argument("--rebalance-months", type=int, default=3, help="Yeniden dengeleme periyodu.")
+    parser.add_argument("--rebalance-months", type=int, default=3, help="Yeniden dengeleme periyodu. 0 verilirse günlük rebalance yapılır.")
     parser.add_argument("--out", type=Path, default=Path("reports/backtest_equity.csv"), help="Backtest çıktı CSV.")
     return parser
 
