@@ -87,6 +87,12 @@ Negatif sınıf az kaldığında KAP dosyalarından yüksek güvenli negatif ör
 uv run mine_negative_examples --input data/raw/kap_api_negative_mining_2026_q2.csv --exclude-labeled data/labels/labeled_news_master.csv --output data/labels/negative_labeling_batch.csv --max-rows 100
 ```
 
+Pozitif sınıfı pay geri alımı, temettü, yeni iş ilişkisi, ihale/sözleşme ve sermaye artırımı gibi yüksek güvenli KAP başlıklarıyla artırmak için:
+
+```powershell
+uv run mine_positive_examples --input data/raw/kap_api_negative_mining_2026_q2.csv --exclude-labeled data/labels/labeled_news_master.csv --output data/labels/positive_labeling_batch.csv --max-rows 80 --per-reason 20
+```
+
 Etiketleme kuralı: `label` kolonuna sadece `negative`, `neutral` veya `positive` yazılır. Yatırımcı açısından şirket değeri/hisse beklentisi için olumlu metinler `positive`, olumsuz metinler `negative`, net yön taşımayanlar `neutral` olmalı.
 
 Etiketleri kontrol etmek için:
