@@ -32,6 +32,11 @@ def run_backtest(sentiment_csv: Path, prices_csv: Path, top_n: int, rebalance_mo
     sentiment = sentiment[sentiment["ticker"].ne("")]
 
     prices = load_prices(prices_csv)
+    price_universe = set(prices["ticker"].unique())
+    sentiment = sentiment[sentiment["ticker"].isin(price_universe)].copy()
+    if sentiment.empty:
+        raise RuntimeError("Backtest için fiyat verisi bulunan ticker'larla eşleşen sentiment satırı yok.")
+
     prices["return"] = prices.groupby("ticker")["close"].pct_change().fillna(0.0)
     wide_returns = prices.pivot(index="date", columns="ticker", values="return").sort_index()
 
