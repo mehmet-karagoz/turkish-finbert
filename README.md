@@ -81,6 +81,12 @@ uv run create_labeling_batch --input data/processed/real_scored_news.csv --outpu
 uv run create_labeling_batch --input data/processed/real_model_scored_news.csv --output data/labels/next_labeling_batch.csv --exclude-labeled data/labels/labeled_news_master.csv --strategy uncertain --max-rows 300 --per-ticker 20 --include-model-hints
 ```
 
+Negatif sınıf az kaldığında KAP dosyalarından yüksek güvenli negatif örnekleri ayrı toplamak için:
+
+```powershell
+uv run mine_negative_examples --input data/raw/kap_api_negative_mining_2026_q2.csv --exclude-labeled data/labels/labeled_news_master.csv --output data/labels/negative_labeling_batch.csv --max-rows 100
+```
+
 Etiketleme kuralı: `label` kolonuna sadece `negative`, `neutral` veya `positive` yazılır. Yatırımcı açısından şirket değeri/hisse beklentisi için olumlu metinler `positive`, olumsuz metinler `negative`, net yön taşımayanlar `neutral` olmalı.
 
 Etiketleri kontrol etmek için:
@@ -131,6 +137,12 @@ uv run prepare_dataset --input data/labels/real_labeling_batch.csv --output data
 
 ```powershell
 uv run train_model --input data/processed/labeled_news.csv --model-out models/baseline_sentiment.joblib --report-dir reports
+```
+
+Negatif/pozitif/nötr sınıfların validasyon setinde temsil edilmesini istiyorsan:
+
+```powershell
+uv run train_model --input data/processed/labeled_news_master.csv --model-out models/master_baseline_sentiment.joblib --report-dir reports/master_baseline --split-strategy stratified
 ```
 
 Üretilen grafikler:

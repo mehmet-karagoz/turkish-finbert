@@ -407,7 +407,9 @@ def fetch_url_sources(args: argparse.Namespace, source_name: str) -> list[NewsIt
 def _kap_date(value: str | None, fallback: datetime) -> str:
     if not value:
         return fallback.date().isoformat()
-    parsed = pd.to_datetime(value, errors="coerce", dayfirst=True)
+    value = clean_text(value)
+    dayfirst = not bool(re.match(r"^\d{4}-\d{1,2}-\d{1,2}$", value))
+    parsed = pd.to_datetime(value, errors="coerce", dayfirst=dayfirst)
     if pd.isna(parsed):
         return fallback.date().isoformat()
     return parsed.date().isoformat()

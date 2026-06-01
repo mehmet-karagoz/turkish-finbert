@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from turkish_fin_bert.fetch_news import (
+    _kap_date,
     detect_tickers,
     normalize_for_match,
     normalize_tickers,
@@ -55,6 +56,10 @@ def test_parse_datetime_uses_dayfirst_for_turkish_kap_dates():
 
     assert date == "2026-06-01"
     assert published_at.startswith("2026-06-01")
+
+
+def test_kap_date_keeps_iso_dates_in_year_month_day_order():
+    assert _kap_date("2026-04-01", fallback=None) == "2026-04-01"
 
 
 def test_rows_from_kap_disclosures_creates_rows_for_stock_codes():
