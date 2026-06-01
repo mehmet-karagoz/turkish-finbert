@@ -45,6 +45,12 @@ KAP bildirim URL'lerini satır satır bir dosyaya koyduktan sonra:
 uv run fetch_news --source kap-links --url-file data/raw/kap_links.txt --tickers THYAO ASELS GARAN --aliases data/raw/company_aliases.csv --out data/raw/kap_news.csv --append
 ```
 
+KAP'ın web uygulamasında kullanılan bildirim sorgu API'sinden son 30 gün bildirimlerini toplamak için:
+
+```powershell
+uv run fetch_news --source kap-api --tickers-file data/raw/tickers_bist_seed.txt --out data/raw/kap_api_news.csv --kap-days 30 --limit 1000
+```
+
 Çıktı şeması: `date`, `ticker`, `source`, `title`, `text`, `url`, `language`, `published_at`.
 
 Ticker eşleşme kalitesini kontrol etmek için:

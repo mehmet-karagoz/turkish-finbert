@@ -1,10 +1,11 @@
 import argparse
 import csv
+import json
 import re
 import unicodedata
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from html import unescape
 from html.parser import HTMLParser
@@ -144,7 +145,8 @@ def parse_datetime(value: str) -> tuple[str, str]:
     except (TypeError, ValueError):
         parsed = None
     if parsed is None:
-        parsed_ts = pd.to_datetime(value, errors="coerce", utc=True)
+        dayfirst = bool(re.match(r"^\d{1,2}[./-]\d{1,2}[./-]\d{4}", value))
+        parsed_ts = pd.to_datetime(value, errors="coerce", utc=True, dayfirst=dayfirst)
         if pd.notna(parsed_ts):
             parsed = parsed_ts.to_pydatetime()
     if parsed is None:
@@ -288,6 +290,53 @@ def rows_from_items(
     return pd.DataFrame(rows, columns=NEWS_COLUMNS)
 
 
+def parse_kap_date(value: str | None) -> tuple[str, str]:
+    return parse_datetime(clean_text(value or ""))
+
+
+def split_stock_codes(value: str | None) -> list[str]:
+    value = clean_text(value or "")
+    if not value:
+        return []
+    return normalize_tickers(re.split(r"[,;\s]+", value))
+
+
+def rows_from_kap_disclosures(disclosures: list[dict], tickers: list[str]) -> pd.DataFrame:
+    allowed = set(tickers)
+    rows: list[dict[str, str]] = []
+    for item in disclosures:
+        stock_codes = split_stock_codes(item.get("stockCodes") or item.get("stockCode"))
+        if allowed:
+            stock_codes = [ticker for ticker in stock_codes if ticker in allowed]
+        if not stock_codes:
+            continue
+
+        date, published_at = parse_kap_date(item.get("publishDate"))
+        disclosure_index = item.get("disclosureIndex")
+        subject = clean_text(item.get("subject", ""))
+        company = clean_text(item.get("kapTitle", ""))
+        summary = clean_text(item.get("summary", ""))
+        related = clean_text(item.get("relatedStocks", ""))
+        title = clean_text(f"{company} - {subject}") if company else subject
+        text = clean_text(" ".join(part for part in [subject, summary, related] if part))
+        url = f"https://www.kap.org.tr/tr/Bildirim/{disclosure_index}" if disclosure_index else "https://www.kap.org.tr/tr/bildirim-sorgu"
+
+        for ticker in stock_codes:
+            rows.append(
+                {
+                    "date": date,
+                    "ticker": ticker,
+                    "source": "KAP",
+                    "title": title,
+                    "text": text or title,
+                    "url": url,
+                    "language": "tr",
+                    "published_at": published_at,
+                }
+            )
+    return pd.DataFrame(rows, columns=NEWS_COLUMNS)
+
+
 def read_url_list(path: Path) -> list[str]:
     urls: list[str] = []
     for line in path.read_text(encoding="utf-8").splitlines():
@@ -355,9 +404,62 @@ def fetch_url_sources(args: argparse.Namespace, source_name: str) -> list[NewsIt
     return [fetch_article(url, source=source_name) for url in urls]
 
 
+def _kap_date(value: str | None, fallback: datetime) -> str:
+    if not value:
+        return fallback.date().isoformat()
+    parsed = pd.to_datetime(value, errors="coerce", dayfirst=True)
+    if pd.isna(parsed):
+        return fallback.date().isoformat()
+    return parsed.date().isoformat()
+
+
+def fetch_kap_api(args: argparse.Namespace) -> list[dict]:
+    now = datetime.now(timezone.utc)
+    from_date = _kap_date(args.kap_from_date, now - timedelta(days=args.kap_days))
+    to_date = _kap_date(args.kap_to_date, now)
+    body = {
+        "fromDate": from_date,
+        "toDate": to_date,
+        "memberType": "IGS",
+        "mkkMemberOidList": [],
+        "inactiveMkkMemberOidList": [],
+        "disclosureClass": args.kap_disclosure_class if args.kap_disclosure_class != "ALL" else "",
+        "subjectList": [],
+        "isLate": "",
+        "mainSector": "",
+        "sector": "",
+        "subSector": "",
+        "marketOid": "",
+        "index": "",
+        "bdkReview": "",
+        "bdkMemberOidList": [],
+        "year": "",
+        "term": "",
+        "ruleType": "",
+        "period": "",
+        "fromSrc": False,
+        "srcCategory": "",
+        "disclosureIndexList": [],
+    }
+    request = Request(
+        "https://www.kap.org.tr/tr/api/disclosure/members/byCriteria",
+        data=json.dumps(body).encode("utf-8"),
+        headers={
+            "User-Agent": DEFAULT_USER_AGENT,
+            "Content-Type": "application/json",
+            "Accept-Language": "tr",
+        },
+        method="POST",
+    )
+    with urlopen(request, timeout=40) as response:
+        raw = response.read()
+    data = json.loads(raw.decode("utf-8", errors="replace"))
+    return data if isinstance(data, list) else []
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Gerçek haber/KAP metinlerini standart haber CSV şemasına toplar.")
-    parser.add_argument("--source", choices=["rss", "urls", "kap-links"], required=True, help="Toplanacak kaynak tipi.")
+    parser.add_argument("--source", choices=["rss", "urls", "kap-links", "kap-api"], required=True, help="Toplanacak kaynak tipi.")
     parser.add_argument("--tickers", nargs="*", default=[], help="Aranacak BIST sembolleri: THYAO ASELS GARAN")
     parser.add_argument("--tickers-file", action="append", type=Path, help="Satır satır veya virgülle ayrılmış BIST sembolleri dosyası.")
     parser.add_argument("--aliases", type=Path, default=None, help="ticker,alias kolonlu şirket adı eşleştirme CSV'si.")
@@ -372,6 +474,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--rss-file", action="append", help="Yerel RSS/Atom XML dosyası. Test ve arşiv için kullanışlı.")
     parser.add_argument("--url", action="append", help="Doğrudan haber veya KAP bildirim URL'si.")
     parser.add_argument("--url-file", action="append", type=Path, help="Satır satır URL içeren dosya.")
+    parser.add_argument("--kap-days", type=int, default=30, help="KAP API için geriye dönük gün sayısı.")
+    parser.add_argument("--kap-from-date", default=None, help="KAP başlangıç tarihi. Örnek: 2026-05-01")
+    parser.add_argument("--kap-to-date", default=None, help="KAP bitiş tarihi. Örnek: 2026-06-01")
+    parser.add_argument("--kap-disclosure-class", choices=["ALL", "ODA", "FR", "DG", "DUY"], default="ALL", help="KAP bildirim tipi filtresi.")
     return parser
 
 
@@ -384,6 +490,15 @@ def main() -> None:
     for path in args.tickers_file or []:
         tickers.extend(read_ticker_file(path))
     tickers = normalize_tickers(tickers)
+
+    if args.source == "kap-api":
+        disclosures = fetch_kap_api(args)
+        if args.limit:
+            disclosures = disclosures[: args.limit]
+        df = rows_from_kap_disclosures(disclosures, tickers)
+        saved = save_news(df, args.out, append=args.append)
+        print(f"{len(df)} yeni KAP satırı hazırlandı. Toplam {len(saved)} satır kaydedildi: {args.out}")
+        return
 
     if args.source == "rss":
         items = fetch_rss_sources(args)
