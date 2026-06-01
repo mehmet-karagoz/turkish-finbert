@@ -133,6 +133,12 @@ Gerçek haberleri model girdisine hazırlamak için:
 uv run prepare_dataset --input data/raw/news.csv --output data/processed/news_prepared.csv
 ```
 
+Birden fazla KAP/RSS arsivini tek temiz haber dosyasinda birlestirmek icin:
+
+```powershell
+uv run prepare_dataset --input data/raw/kap_api_negative_mining_2025_q1.csv data/raw/kap_api_negative_mining_2025_q2.csv data/raw/kap_api_negative_mining_2025_q3.csv data/raw/kap_api_negative_mining_2025_q4.csv data/raw/kap_api_negative_mining_2026_q1.csv data/raw/kap_api_negative_mining_2026_q2.csv --output data/processed/kap_api_historical_prepared.csv
+```
+
 Gerçek etiketli CSV hazır olduğunda:
 
 ```powershell
@@ -167,15 +173,45 @@ uv run score_news --model models/baseline_sentiment.joblib --input data/processe
 - `prob_positive - prob_negative` değeri günlük sentiment skorudur.
 - `sentiment_3d`, `sentiment_7d`, `sentiment_14d` kolonları hisse bazlı hareketli ortalamalardır.
 
-## 6. Fiyat Verisi Çekme
+## 6. Gunluk Alarm ve Ranking
+
+Bugun icin en iyi/en kotu hisseleri, en guclu pozitif/negatif haberleri ve piyasa geneli aday haberleri uretmek icin:
+
+```powershell
+uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --out-dir reports/daily_alerts --top-n 10
+```
+
+Belirli bir tarih icin:
+
+```powershell
+uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-01 --out-dir reports/daily_alerts --top-n 10
+```
+
+Telegram'a gondermek icin token ve chat id ortam degiskeni olarak verilir:
+
+```powershell
+$env:TELEGRAM_BOT_TOKEN="BOT_TOKEN"
+$env:TELEGRAM_CHAT_ID="CHAT_ID"
+uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --send-telegram
+```
+
+Uretilen dosyalar: gunluk Markdown raporu, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
+
+## 7. Fiyat Verisi
 
 ```powershell
 uv run fetch_data --tickers THYAO ASELS GARAN --start 2022-01-01 --out data/raw/prices.csv
 ```
 
-Not: BIST sembollerine otomatik `.IS` eki eklenir.
+Geniş seed listesinden fiyat çekmek için:
 
-## 7. Finansal Etki Analizi
+```powershell
+uv run fetch_data --tickers-file data/raw/tickers_bist_seed.txt --start 2025-01-01 --out data/raw/bist_prices_extended.csv
+```
+
+Not: BIST sembollerine otomatik `.IS` eki eklenir; `--tickers` ve `--tickers-file` birlikte kullanılabilir.
+
+## 8. Finansal Etki Analizi
 
 ```powershell
 uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --out reports/financial_effect.csv
@@ -187,7 +223,7 @@ uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv -
 - `reports/figures/sentiment_return_correlation.png`: Sentiment ile 1/5/20 günlük ileri getiriler arasındaki ilişkiyi gösterir.
 - `reports/figures/price_sentiment_<TICKER>.png`: Hisse fiyatı ile sentiment skorunu birlikte gösterir.
 
-## 8. Basit Backtest
+## 9. Basit Backtest
 
 ```powershell
 uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --top-n 5 --rebalance-months 3 --out reports/backtest_equity.csv
@@ -198,7 +234,7 @@ uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw
 - `reports/figures/backtest_equity.png`: Strateji ile eşit ağırlıklı benchmark kümülatif getirisi.
 - `reports/figures/backtest_drawdown.png`: Stratejinin maksimum düşüş dönemleri.
 
-## 9. Opsiyonel BERT Fine-Tuning
+## 10. Opsiyonel BERT Fine-Tuning
 
 ```powershell
 uv run train_transformer --input data/processed/labeled_news.csv --model-name dbmdz/bert-base-turkish-cased --output-dir models/berturk_sentiment

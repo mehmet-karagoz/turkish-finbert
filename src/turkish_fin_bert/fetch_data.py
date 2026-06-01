@@ -1,4 +1,5 @@
 import argparse
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -10,6 +11,31 @@ from .paths import ensure_project_dirs
 def bist_symbol(ticker: str) -> str:
     ticker = ticker.upper().strip()
     return ticker if ticker.endswith(".IS") else f"{ticker}.IS"
+
+
+def read_ticker_file(path: Path) -> list[str]:
+    tickers: list[str] = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        value = line.strip()
+        if not value or value.startswith("#"):
+            continue
+        tickers.extend(part.strip() for part in re.split(r"[,;\s]+", value) if part.strip())
+    return tickers
+
+
+def normalize_tickers(tickers: list[str]) -> list[str]:
+    return sorted({ticker.upper().replace(".IS", "").strip() for ticker in tickers if ticker.strip()})
+
+
+def resolve_tickers(tickers: list[str] | None, ticker_files: list[Path] | None) -> list[str]:
+    resolved: list[str] = []
+    resolved.extend(tickers or [])
+    for path in ticker_files or []:
+        resolved.extend(read_ticker_file(path))
+    normalized = normalize_tickers(resolved)
+    if not normalized:
+        raise ValueError("En az bir ticker verilmeli: --tickers veya --tickers-file kullanin.")
+    return normalized
 
 
 def normalize_price_frame(data: pd.DataFrame, ticker: str) -> pd.DataFrame:
@@ -57,7 +83,8 @@ def fetch_prices(tickers: list[str], start: str, end: str | None, out_csv: Path)
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="BIST hisseleri için yfinance fiyat verisi çeker.")
-    parser.add_argument("--tickers", nargs="+", required=True, help="BIST sembolleri: THYAO ASELS GARAN")
+    parser.add_argument("--tickers", nargs="+", help="BIST sembolleri: THYAO ASELS GARAN")
+    parser.add_argument("--tickers-file", action="append", type=Path, help="Satir satir veya virgul/boslukla ayrilmis BIST sembolleri dosyasi.")
     parser.add_argument("--start", default="2022-01-01", help="Başlangıç tarihi.")
     parser.add_argument("--end", default=None, help="Bitiş tarihi. Boşsa bugüne kadar çeker.")
     parser.add_argument("--out", type=Path, default=Path("data/raw/prices.csv"), help="Fiyat CSV çıktı yolu.")
@@ -68,7 +95,8 @@ def main() -> None:
     configure_console()
     ensure_project_dirs()
     args = build_parser().parse_args()
-    prices = fetch_prices(args.tickers, args.start, args.end, args.out)
+    tickers = resolve_tickers(args.tickers, args.tickers_file)
+    prices = fetch_prices(tickers, args.start, args.end, args.out)
     print(f"{len(prices)} fiyat satırı kaydedildi: {args.out}")
 
 

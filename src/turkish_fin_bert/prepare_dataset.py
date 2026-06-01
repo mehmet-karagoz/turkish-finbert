@@ -13,8 +13,15 @@ LABELS = {"negative", "neutral", "positive"}
 REQUIRED_COLUMNS = {"date", "ticker", "title", "text", "source", "url"}
 
 
-def prepare_dataset(input_csv: Path, output_csv: Path, labeled: bool = False, min_chars: int = 20) -> pd.DataFrame:
-    df = pd.read_csv(input_csv)
+def read_inputs(input_csv: Path | list[Path]) -> pd.DataFrame:
+    paths = [input_csv] if isinstance(input_csv, Path) else input_csv
+    if not paths:
+        raise ValueError("En az bir input CSV verilmeli.")
+    return pd.concat((pd.read_csv(path) for path in paths), ignore_index=True)
+
+
+def prepare_dataset(input_csv: Path | list[Path], output_csv: Path, labeled: bool = False, min_chars: int = 20) -> pd.DataFrame:
+    df = read_inputs(input_csv)
 
     missing = REQUIRED_COLUMNS - set(df.columns)
     if missing:
@@ -53,7 +60,7 @@ def prepare_dataset(input_csv: Path, output_csv: Path, labeled: bool = False, mi
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Ham Türkçe finans metinlerini temizler ve model veri setine çevirir.")
-    parser.add_argument("--input", type=Path, required=True, help="Ham CSV yolu.")
+    parser.add_argument("--input", type=Path, nargs="+", required=True, help="Ham CSV yolu veya yolları.")
     parser.add_argument("--output", type=Path, required=True, help="Temizlenmiş CSV yolu.")
     parser.add_argument("--labeled", action="store_true", help="CSV içinde label kolonu varsa açılır.")
     parser.add_argument("--min-chars", type=int, default=20, help="Minimum metin uzunluğu.")

@@ -43,6 +43,7 @@ prepare_dataset = "turkish_fin_bert.prepare_dataset:main"
 train_model = "turkish_fin_bert.train_model:main"
 train_transformer = "turkish_fin_bert.train_transformer:main"
 score_news = "turkish_fin_bert.score_news:main"
+daily_alerts = "turkish_fin_bert.daily_alerts:main"
 analyze_financial_effect = "turkish_fin_bert.financial_effect:main"
 backtest = "turkish_fin_bert.backtest:main"
 
