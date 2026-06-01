@@ -69,6 +69,12 @@ Model tahminlerini yardımcı kolon olarak görmek istersen:
 uv run create_labeling_batch --input data/processed/real_scored_news.csv --output data/labels/real_labeling_batch.csv --max-rows 300 --per-ticker 20 --include-model-hints
 ```
 
+Önceden etiketlenmiş haberleri atlayıp modelin en kararsız kaldığı haberleri seçmek için:
+
+```powershell
+uv run create_labeling_batch --input data/processed/real_model_scored_news.csv --output data/labels/next_labeling_batch.csv --exclude-labeled data/labels/labeled_news_master.csv --strategy uncertain --max-rows 300 --per-ticker 20 --include-model-hints
+```
+
 Etiketleme kuralı: `label` kolonuna sadece `negative`, `neutral` veya `positive` yazılır. Yatırımcı açısından şirket değeri/hisse beklentisi için olumlu metinler `positive`, olumsuz metinler `negative`, net yön taşımayanlar `neutral` olmalı.
 
 Etiketleri kontrol etmek için:
@@ -77,12 +83,19 @@ Etiketleri kontrol etmek için:
 uv run create_labeling_batch --input data/labels/real_labeling_batch.csv --validate-only
 ```
 
+Etiketlenmiş batch dosyalarını master dosyada toplamak için:
+
+```powershell
+uv run merge_labels --input data/labels/real_labeling_batch.csv --output data/labels/labeled_news_master.csv
+```
+
 Üretilen grafikler:
 
 - `reports/figures/labeling_text_length_distribution.png`: Etiketlenecek metinlerin yeterli bilgi taşıyıp taşımadığını gösterir.
 - `reports/figures/labeling_daily_text_counts.png`: Etiket havuzunun hangi günlerde yoğunlaştığını gösterir.
 - `reports/figures/labeling_source_distribution.png`: Haber kaynaklarının dağılımını gösterir.
 - `reports/figures/labeling_ticker_distribution.png`: Etiketlenecek haberlerin hisselere göre dengesini gösterir.
+- `reports/figures/master_label_distribution.png`: Master etiketli veri setindeki sınıf dengesini gösterir.
 
 ## 3. Örnek Etiketli Veri Hazırlama
 

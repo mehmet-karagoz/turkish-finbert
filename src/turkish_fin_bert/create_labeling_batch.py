@@ -11,17 +11,63 @@ from .visualize import plot_daily_counts, plot_source_counts, plot_text_lengths,
 
 BASE_COLUMNS = ["label_id", "label", "date", "ticker", "source", "title", "text", "url", "notes"]
 LABELS = {"negative", "neutral", "positive"}
+PROB_COLUMNS = ["prob_negative", "prob_neutral", "prob_positive"]
+MODEL_PROB_COLUMNS = ["model_prob_negative", "model_prob_neutral", "model_prob_positive"]
 
 
-def _sample_rows(df: pd.DataFrame, max_rows: int, per_ticker: int, seed: int) -> pd.DataFrame:
+def row_key(df: pd.DataFrame) -> pd.Series:
+    url = df.get("url", pd.Series("", index=df.index)).fillna("").astype(str).str.strip().str.lower()
+    fallback = (
+        df.get("ticker", pd.Series("", index=df.index)).fillna("").astype(str).str.upper().str.strip()
+        + "|"
+        + df.get("title", pd.Series("", index=df.index)).fillna("").astype(str).map(clean_text).str.lower()
+        + "|"
+        + df.get("text", pd.Series("", index=df.index)).fillna("").astype(str).map(clean_text).str.lower()
+    )
+    return url.where(url.ne(""), fallback)
+
+
+def _exclude_labeled_rows(df: pd.DataFrame, labeled_paths: list[Path]) -> pd.DataFrame:
+    if not labeled_paths:
+        return df
+    keys: set[str] = set()
+    for path in labeled_paths:
+        if not path.exists():
+            continue
+        labeled = pd.read_csv(path)
+        if "label" in labeled.columns:
+            labels = labeled["label"].fillna("").astype(str).str.strip()
+            labeled = labeled[labels.ne("")]
+        keys.update(row_key(labeled).dropna().astype(str).tolist())
+    if not keys:
+        return df
+    return df[~row_key(df).isin(keys)].copy()
+
+
+def _rank_rows(df: pd.DataFrame, strategy: str, seed: int) -> pd.DataFrame:
+    if strategy == "random":
+        return df.sample(frac=1, random_state=seed).reset_index(drop=True)
+    if strategy == "uncertain":
+        prob_cols = [col for col in PROB_COLUMNS if col in df.columns]
+        if len(prob_cols) != 3:
+            prob_cols = [col for col in MODEL_PROB_COLUMNS if col in df.columns]
+        if len(prob_cols) == 3:
+            ranked = df.copy()
+            ranked["_uncertainty"] = 1 - ranked[prob_cols].max(axis=1)
+            return ranked.sort_values(["_uncertainty", "date"], ascending=[False, False]).drop(columns=["_uncertainty"])
+    return df.sort_values(["date", "ticker", "source", "title"], ascending=[False, True, True, True])
+
+
+def _sample_rows(df: pd.DataFrame, max_rows: int, per_ticker: int, seed: int, strategy: str) -> pd.DataFrame:
+    df = _rank_rows(df, strategy=strategy, seed=seed)
     if per_ticker > 0 and "ticker" in df:
-        parts = [group.sample(n=min(per_ticker, len(group)), random_state=seed) for _, group in df.groupby("ticker", sort=False)]
+        parts = [group.head(per_ticker) for _, group in df.groupby("ticker", sort=False)]
         sampled = pd.concat(parts, ignore_index=True) if parts else df.head(0).copy()
     else:
         sampled = df.copy()
 
     if max_rows > 0 and len(sampled) > max_rows:
-        sampled = sampled.sample(n=max_rows, random_state=seed)
+        sampled = sampled.sample(n=max_rows, random_state=seed) if strategy == "random" else sampled.head(max_rows)
     return sampled.sort_values(["date", "ticker", "source", "title"], ascending=[False, True, True, True]).reset_index(drop=True)
 
 
@@ -34,6 +80,8 @@ def create_labeling_batch(
     min_chars: int = 20,
     include_untagged: bool = False,
     include_model_hints: bool = False,
+    exclude_labeled: list[Path] | None = None,
+    strategy: str = "recent",
 ) -> pd.DataFrame:
     df = pd.read_csv(input_csv)
     required = {"date", "ticker", "title", "text", "source", "url"}
@@ -51,8 +99,9 @@ def create_labeling_batch(
     if not include_untagged:
         df = df[df["ticker"].ne("")].copy()
     df = df.drop_duplicates(subset=["ticker", "title", "text", "url"])
+    df = _exclude_labeled_rows(df, exclude_labeled or [])
 
-    sampled = _sample_rows(df, max_rows=max_rows, per_ticker=per_ticker, seed=seed)
+    sampled = _sample_rows(df, max_rows=max_rows, per_ticker=per_ticker, seed=seed, strategy=strategy)
     sampled.insert(0, "label_id", [f"N{i:06d}" for i in range(1, len(sampled) + 1)])
     sampled.insert(1, "label", "")
     sampled["notes"] = ""
@@ -104,6 +153,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--min-chars", type=int, default=20, help="Minimum metin uzunluğu.")
     parser.add_argument("--include-untagged", action="store_true", help="Ticker bulunmayan haberleri de etiketleme havuzuna al.")
     parser.add_argument("--include-model-hints", action="store_true", help="Varsa model tahmini ve olasılıklarını yardımcı kolon olarak ekle.")
+    parser.add_argument("--exclude-labeled", action="append", type=Path, default=[], help="Daha önce etiketlenmiş CSV. Birden fazla kez verilebilir.")
+    parser.add_argument("--strategy", choices=["recent", "random", "uncertain"], default="recent", help="Aday seçimi: yeni, rastgele veya modelin kararsız kaldığı haberler.")
     parser.add_argument("--validate-only", action="store_true", help="Yeni CSV üretmeden mevcut label kolonunu kontrol eder.")
     return parser
 
@@ -126,6 +177,8 @@ def main() -> None:
         min_chars=args.min_chars,
         include_untagged=args.include_untagged,
         include_model_hints=args.include_model_hints,
+        exclude_labeled=args.exclude_labeled,
+        strategy=args.strategy,
     )
     print(f"{len(df)} haber etiketleme için hazırlandı: {args.output}")
 

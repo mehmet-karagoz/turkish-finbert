@@ -1,8 +1,13 @@
 from pathlib import Path
 
-import matplotlib.pyplot as plt
+import matplotlib
 import pandas as pd
 import seaborn as sns
+
+
+matplotlib.use("Agg")
+
+import matplotlib.pyplot as plt
 
 
 def _save_current(path: Path) -> None:
@@ -50,8 +55,11 @@ def plot_ticker_label_distribution(df: pd.DataFrame, out: Path) -> None:
 def plot_source_counts(df: pd.DataFrame, out: Path) -> None:
     if "source" not in df:
         return
+    counts = df["source"].fillna("unknown").value_counts().head(15)
+    if counts.empty:
+        return
     plt.figure(figsize=(8, 4))
-    df["source"].fillna("unknown").value_counts().head(15).plot(kind="bar")
+    counts.plot(kind="bar")
     plt.title("Kaynak dağılımı")
     plt.xlabel("Kaynak")
     plt.ylabel("Metin sayısı")
