@@ -8,6 +8,7 @@ import pandas as pd
 
 from .console import configure_console
 from .paths import ensure_project_dirs
+from .signal_quality import build_event_signals
 
 
 MARKET_KEYWORDS = [
@@ -94,24 +95,61 @@ def _format_news_rows(rows: pd.DataFrame) -> list[str]:
     return lines or ["- Veri yok"]
 
 
+def _format_event_rows(rows: pd.DataFrame) -> list[str]:
+    lines: list[str] = []
+    for _, row in rows.iterrows():
+        title = row["title"] or "Baslik yok"
+        lines.append(
+            "- "
+            f"{row['tickers']}: {row['avg_impact_score']:+.3f}, "
+            f"onem {row['materiality_score']:.2f}, "
+            f"{row['signal_strength']} | {row['event_type']} | {title}"
+        )
+    return lines or ["- Veri yok"]
+
+
 def build_markdown_report(
     report_date: pd.Timestamp,
+    event_signals: pd.DataFrame,
     top_stocks: pd.DataFrame,
     bottom_stocks: pd.DataFrame,
     positive_news: pd.DataFrame,
     negative_news: pd.DataFrame,
     market_news: pd.DataFrame,
     daily_rows: pd.DataFrame,
+    min_abs_score: float = 0.20,
 ) -> str:
     avg_score = float(daily_rows["sentiment_score"].mean()) if not daily_rows.empty else 0.0
     total_news = int(daily_rows["news_count"].sum()) if not daily_rows.empty else 0
     direction = "pozitif" if avg_score > 0.05 else "negatif" if avg_score < -0.05 else "notr"
     date_text = report_date.strftime("%Y-%m-%d")
+    signal_count = (
+        len(event_signals)
+        + len(top_stocks)
+        + len(bottom_stocks)
+        + len(positive_news)
+        + len(negative_news)
+        + len(market_news)
+    )
+    strong_event_count = (
+        int(event_signals["signal_strength"].isin(["medium", "strong"]).sum()) if not event_signals.empty else 0
+    )
+    if not signal_count:
+        summary = "Bugun esigi asan anlamli haber/hisse sinyali yok."
+    elif strong_event_count:
+        summary = "Bugun orta/guclu olay sinyali var."
+    else:
+        summary = "Bugun esigi asan ancak zayif sinyaller var."
 
     lines = [
         f"# BIST Gunluk Sentiment Raporu - {date_text}",
         "",
         f"Genel skor: {avg_score:+.3f} ({direction}), haber adedi: {total_news}",
+        f"Sinyal esigi: |skor| >= {min_abs_score:.2f}",
+        summary,
+        "",
+        "## Onemli Olay Ozeti",
+        *_format_event_rows(event_signals),
         "",
         "## En Iyi Hisseler",
         *_format_stock_rows(top_stocks),
@@ -137,6 +175,7 @@ def generate_daily_alerts(
     out_dir: Path,
     date: str | None = None,
     top_n: int = 10,
+    min_abs_score: float = 0.20,
 ) -> dict[str, pd.DataFrame | Path | str]:
     scored = prepare_scored_news(scored_news_csv)
     daily = prepare_daily_sentiment(daily_sentiment_csv)
@@ -147,16 +186,27 @@ def generate_daily_alerts(
     if news_day.empty and daily_day.empty:
         raise RuntimeError(f"{report_date.date()} icin haber/sentiment verisi yok.")
 
-    top_stocks = daily_day.sort_values(["sentiment_score", "news_count"], ascending=[False, False]).head(top_n)
-    bottom_stocks = daily_day.sort_values(["sentiment_score", "news_count"], ascending=[True, False]).head(top_n)
-    positive_news = news_day.sort_values("impact_score", ascending=False).head(top_n)
-    negative_news = news_day.sort_values("impact_score", ascending=True).head(top_n)
+    top_stocks = (
+        daily_day[daily_day["sentiment_score"].ge(min_abs_score)]
+        .sort_values(["sentiment_score", "news_count"], ascending=[False, False])
+        .head(top_n)
+    )
+    bottom_stocks = (
+        daily_day[daily_day["sentiment_score"].le(-min_abs_score)]
+        .sort_values(["sentiment_score", "news_count"], ascending=[True, False])
+        .head(top_n)
+    )
+    positive_news = news_day[news_day["impact_score"].ge(min_abs_score)].sort_values("impact_score", ascending=False).head(top_n)
+    negative_news = news_day[news_day["impact_score"].le(-min_abs_score)].sort_values("impact_score", ascending=True).head(top_n)
     market_news = news_day[news_day.apply(is_market_wide_news, axis=1)].copy()
+    market_news = market_news[market_news["impact_score"].abs().ge(min_abs_score)]
     market_news = market_news.reindex(market_news["impact_score"].abs().sort_values(ascending=False).index).head(top_n)
+    event_signals = build_event_signals(news_day, min_abs_score=min_abs_score, top_n=top_n)
 
     out_dir.mkdir(parents=True, exist_ok=True)
     date_slug = report_date.strftime("%Y-%m-%d")
     paths = {
+        "event_signals": out_dir / f"{date_slug}_event_signals.csv",
         "top_stocks": out_dir / f"{date_slug}_top_stocks.csv",
         "bottom_stocks": out_dir / f"{date_slug}_bottom_stocks.csv",
         "positive_news": out_dir / f"{date_slug}_positive_news.csv",
@@ -164,19 +214,31 @@ def generate_daily_alerts(
         "market_news": out_dir / f"{date_slug}_market_news.csv",
         "markdown": out_dir / f"{date_slug}_daily_alerts.md",
     }
+    event_signals.to_csv(paths["event_signals"], index=False)
     top_stocks.to_csv(paths["top_stocks"], index=False)
     bottom_stocks.to_csv(paths["bottom_stocks"], index=False)
     positive_news.to_csv(paths["positive_news"], index=False)
     negative_news.to_csv(paths["negative_news"], index=False)
     market_news.to_csv(paths["market_news"], index=False)
 
-    markdown = build_markdown_report(report_date, top_stocks, bottom_stocks, positive_news, negative_news, market_news, daily_day)
+    markdown = build_markdown_report(
+        report_date,
+        event_signals,
+        top_stocks,
+        bottom_stocks,
+        positive_news,
+        negative_news,
+        market_news,
+        daily_day,
+        min_abs_score=min_abs_score,
+    )
     paths["markdown"].write_text(markdown, encoding="utf-8")
 
     return {
         "date": date_slug,
         "markdown_text": markdown,
         "markdown_path": paths["markdown"],
+        "event_signals": event_signals,
         "top_stocks": top_stocks,
         "bottom_stocks": bottom_stocks,
         "positive_news": positive_news,
@@ -200,6 +262,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--daily-sentiment", type=Path, required=True, help="score_news gunluk sentiment cikti CSV.")
     parser.add_argument("--date", help="Rapor tarihi. Bos verilirse verideki son tarih kullanilir.")
     parser.add_argument("--top-n", type=int, default=10, help="Listelerde gosterilecek satir sayisi.")
+    parser.add_argument("--min-abs-score", type=float, default=0.20, help="Rapora girmek icin gereken minimum mutlak sentiment skoru.")
     parser.add_argument("--out-dir", type=Path, default=Path("reports/daily_alerts"), help="Rapor cikti klasoru.")
     parser.add_argument("--send-telegram", action="store_true", help="Raporu Telegram'a gonderir.")
     parser.add_argument("--telegram-token-env", default="TELEGRAM_BOT_TOKEN", help="Bot token env var adi.")
@@ -211,7 +274,14 @@ def main() -> None:
     configure_console()
     ensure_project_dirs()
     args = build_parser().parse_args()
-    result = generate_daily_alerts(args.scored_news, args.daily_sentiment, args.out_dir, date=args.date, top_n=args.top_n)
+    result = generate_daily_alerts(
+        args.scored_news,
+        args.daily_sentiment,
+        args.out_dir,
+        date=args.date,
+        top_n=args.top_n,
+        min_abs_score=args.min_abs_score,
+    )
     print(f"Gunluk rapor kaydedildi: {result['markdown_path']}")
     if args.send_telegram:
         token = os.getenv(args.telegram_token_env, "")

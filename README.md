@@ -175,16 +175,28 @@ uv run score_news --model models/baseline_sentiment.joblib --input data/processe
 
 ## 6. Gunluk Alarm ve Ranking
 
+KAP'tan gunluk haberleri cekip temizlemek, modeli calistirmak ve ranking/alarm raporunu tek komutla uretmek icin:
+
+```powershell
+uv run daily_pipeline --kap-days 7 --top-n 10 --min-abs-score 0.20
+```
+
+Belirli bir KAP tarih araligi ve rapor tarihi icin:
+
+```powershell
+uv run daily_pipeline --kap-from-date 2026-06-01 --kap-to-date 2026-06-06 --date 2026-06-06 --top-n 10 --min-abs-score 0.20
+```
+
 Bugun icin en iyi/en kotu hisseleri, en guclu pozitif/negatif haberleri ve piyasa geneli aday haberleri uretmek icin:
 
 ```powershell
-uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --out-dir reports/daily_alerts --top-n 10
+uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
 ```
 
 Belirli bir tarih icin:
 
 ```powershell
-uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-01 --out-dir reports/daily_alerts --top-n 10
+uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-01 --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
 ```
 
 Telegram'a gondermek icin token ve chat id ortam degiskeni olarak verilir:
@@ -195,7 +207,9 @@ $env:TELEGRAM_CHAT_ID="CHAT_ID"
 uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --send-telegram
 ```
 
-Uretilen dosyalar: gunluk Markdown raporu, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
+Uretilen dosyalar: gunluk Markdown raporu, olay sinyali CSV'si, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
+
+Gunluk raporda `Onemli Olay Ozeti` bolumu model skorunu tek basina listelemek yerine haberleri olay seviyesinde gruplar. Bu bolum `materiality_score`, `signal_strength`, olay tipi ve etkilenen ticker listesini kullanarak "bugun anlamli olay var mi, yok mu?" sorusuna daha urun odakli cevap verir.
 
 ## 7. Fiyat Verisi
 
