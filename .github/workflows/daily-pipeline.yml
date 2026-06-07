@@ -1,0 +1,108 @@
+name: Daily BIST Sentiment Pipeline
+
+on:
+  schedule:
+    # Turkey time is UTC+3. These run at 08:30 and 18:30 Turkey time.
+    - cron: "30 5 * * *"
+    - cron: "30 15 * * *"
+  workflow_dispatch:
+    inputs:
+      kap_days:
+        description: "KAP icin geriye donuk gun sayisi"
+        required: false
+        default: "7"
+      baseline_lookback_days:
+        description: "Gecmis karsilastirma gun sayisi"
+        required: false
+        default: "365"
+      baseline_min_history:
+        description: "Anomali icin minimum gecmis gun sayisi"
+        required: false
+        default: "5"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-bist-sentiment
+  cancel-in-progress: false
+
+jobs:
+  daily-pipeline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Train deploy model
+        run: |
+          uv run train_model \
+            --input data/labels/labeled_news_master.csv \
+            --model-out models/master_baseline_sentiment.joblib \
+            --report-dir reports/master_baseline \
+            --split-strategy stratified
+
+      - name: Run daily pipeline
+        env:
+          KAP_DAYS: ${{ github.event.inputs.kap_days }}
+          BASELINE_LOOKBACK_DAYS: ${{ github.event.inputs.baseline_lookback_days }}
+          BASELINE_MIN_HISTORY: ${{ github.event.inputs.baseline_min_history }}
+        run: |
+          KAP_DAYS="${KAP_DAYS:-7}"
+          BASELINE_LOOKBACK_DAYS="${BASELINE_LOOKBACK_DAYS:-365}"
+          BASELINE_MIN_HISTORY="${BASELINE_MIN_HISTORY:-5}"
+
+          uv run daily_pipeline \
+            --kap-days "$KAP_DAYS" \
+            --update-history \
+            --baseline-lookback-days "$BASELINE_LOOKBACK_DAYS" \
+            --baseline-min-history "$BASELINE_MIN_HISTORY"
+
+      - name: Upload daily outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-bist-sentiment-${{ github.run_number }}
+          if-no-files-found: warn
+          retention-days: 30
+          path: |
+            reports/daily_alerts/
+            data/raw/kap_daily.csv
+            data/processed/kap_daily_prepared.csv
+            data/processed/kap_daily_scored_news.csv
+            data/processed/kap_daily_sentiment.csv
+
+      - name: Commit updated historical outputs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -f \
+            data/raw/kap_api_historical_news.csv \
+            data/processed/kap_api_historical_prepared.csv \
+            data/processed/kap_api_historical_scored_news.csv \
+            data/processed/kap_api_historical_daily_sentiment.csv \
+            reports/daily_alerts
+
+          if git diff --cached --quiet; then
+            echo "No report or historical data changes to commit."
+          else
+            git commit -m "Update daily BIST sentiment outputs [skip ci]"
+            git push
+          fi

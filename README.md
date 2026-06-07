@@ -243,7 +243,27 @@ Kisa ozet `Karar`, `Sonuc`, `Akis` ve `Oncelik seviyesi` satirlariyla "bugun anl
 
 `Gecmis Karsilastirma` bolumu rapor tarihinden sonraki veriyi kullanmaz; historical dosyada rapor gunu veya sonrasi satirlar olsa bile baseline icin sadece rapor tarihinden onceki gunler kullanilir. Rapor gununun current satirlari ise `--daily-sentiment` dosyasindan gelir. Kisa ozet bu bilgiyle `gecmise gore olagan`, `gecmise gore dikkat cekici` veya `gecmise gore sira disi` gibi daha okunur karar notlari uretir.
 
-## 7. Fiyat Verisi
+## 7. Ucretsiz GitHub Actions Deploy
+
+Bilgisayari acik birakmadan gunluk rapor uretmek icin `.github/workflows/daily-pipeline.yml` workflow'u kullanilir. Bu workflow her gun Turkiye saatiyle 08:30 ve 18:30'da calisir; ayrica GitHub Actions ekranindan manuel de tetiklenebilir.
+
+Workflow sirasi:
+
+1. Python ve `uv` kurulur.
+2. `data/labels/labeled_news_master.csv` ile model yeniden egitilir.
+3. `daily_pipeline --update-history` calisir.
+4. Gunluk raporlar artifact olarak saklanir.
+5. Historical KAP/sentiment CSV'leri ve `reports/daily_alerts` klasoru repo'ya geri commit edilir.
+
+GitHub'da yapilacaklar:
+
+1. Repository `Settings -> Actions -> General` ekraninda workflow izinlerini `Read and write permissions` yap.
+2. `Actions -> Daily BIST Sentiment Pipeline -> Run workflow` ile ilk manuel calistirmayi yap.
+3. Calisma bittikten sonra `reports/daily_alerts` klasorundeki yeni brief dosyasini ve workflow artifact'ini kontrol et.
+
+Model dosyalari `.gitignore` icinde oldugu icin workflow modeli her calismada yeniden egitir. Bu sayede `models/*.joblib` dosyasini GitHub'a yuklemek gerekmez.
+
+## 8. Fiyat Verisi
 
 ```powershell
 uv run fetch_data --tickers THYAO ASELS GARAN --start 2022-01-01 --out data/raw/prices.csv
@@ -257,7 +277,7 @@ uv run fetch_data --tickers-file data/raw/tickers_bist_seed.txt --start 2025-01-
 
 Not: BIST sembollerine otomatik `.IS` eki eklenir; `--tickers` ve `--tickers-file` birlikte kullanılabilir.
 
-## 8. Finansal Etki Analizi
+## 9. Finansal Etki Analizi
 
 ```powershell
 uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --out reports/financial_effect.csv
@@ -269,7 +289,7 @@ uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv -
 - `reports/figures/sentiment_return_correlation.png`: Sentiment ile 1/5/20 günlük ileri getiriler arasındaki ilişkiyi gösterir.
 - `reports/figures/price_sentiment_<TICKER>.png`: Hisse fiyatı ile sentiment skorunu birlikte gösterir.
 
-## 9. Basit Backtest
+## 10. Basit Backtest
 
 ```powershell
 uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --top-n 5 --rebalance-months 3 --out reports/backtest_equity.csv
