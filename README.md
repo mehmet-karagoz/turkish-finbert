@@ -258,8 +258,9 @@ Workflow sirasi:
 GitHub'da yapilacaklar:
 
 1. Repository `Settings -> Actions -> General` ekraninda workflow izinlerini `Read and write permissions` yap.
-2. `Actions -> Daily BIST Sentiment Pipeline -> Run workflow` ile ilk manuel calistirmayi yap.
-3. Calisma bittikten sonra `reports/daily_alerts` klasorundeki yeni brief dosyasini ve workflow artifact'ini kontrol et.
+2. Telegram bildirimi icin `Settings -> Secrets and variables -> Actions` ekranina `TELEGRAM_BOT_TOKEN` ve `TELEGRAM_CHAT_ID` secret'larini ekle.
+3. `Actions -> Daily BIST Sentiment Pipeline -> Run workflow` ile ilk manuel calistirmayi yap.
+4. Calisma bittikten sonra Telegram mesajini, `reports/daily_alerts` klasorundeki yeni brief dosyasini ve workflow artifact'ini kontrol et.
 
 Model dosyalari `.gitignore` icinde oldugu icin workflow modeli her calismada yeniden egitir. Bu sayede `models/*.joblib` dosyasini GitHub'a yuklemek gerekmez.
 

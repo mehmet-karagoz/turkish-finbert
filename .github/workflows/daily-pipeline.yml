@@ -75,6 +75,48 @@ jobs:
             --baseline-lookback-days "$BASELINE_LOOKBACK_DAYS" \
             --baseline-min-history "$BASELINE_MIN_HISTORY"
 
+      - name: Send Telegram brief
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
+            echo "Telegram secrets are not set. Skipping Telegram send."
+            exit 0
+          fi
+
+          python - <<'PY'
+          import os
+          import urllib.parse
+          import urllib.request
+          from pathlib import Path
+
+          brief_files = sorted(
+              Path("reports/daily_alerts").glob("*_brief.md"),
+              key=lambda path: path.stat().st_mtime,
+          )
+          if not brief_files:
+              raise SystemExit("No brief report found under reports/daily_alerts.")
+
+          brief_path = brief_files[-1]
+          text = brief_path.read_text(encoding="utf-8")[:3900]
+          payload = urllib.parse.urlencode(
+              {
+                  "chat_id": os.environ["TELEGRAM_CHAT_ID"],
+                  "text": text,
+              }
+          ).encode("utf-8")
+          request = urllib.request.Request(
+              f"https://api.telegram.org/bot{os.environ['TELEGRAM_BOT_TOKEN']}/sendMessage",
+              data=payload,
+              method="POST",
+          )
+          with urllib.request.urlopen(request, timeout=20) as response:
+              if response.status >= 400:
+                  raise RuntimeError(f"Telegram send failed with HTTP {response.status}")
+          print(f"Telegram brief sent: {brief_path}")
+          PY
+
       - name: Upload daily outputs
         uses: actions/upload-artifact@v4
         with:
