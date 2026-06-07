@@ -81,8 +81,10 @@ Check:
 
 Check:
 
-- `TELEGRAM_ALLOWED_CHAT_ID` exactly matches your Telegram chat ID.
-- The chat ID is stored as a plain number string.
+- `TELEGRAM_ALLOWED_CHAT_ID` includes the chat ID that sent the command.
+- Private chat and group IDs are different.
+- Group/supergroup IDs usually start with `-100`.
+- Multiple allowed IDs are comma-separated, for example `123456789,-1001234567890`.
 
 ### Telegram final report does not arrive
 

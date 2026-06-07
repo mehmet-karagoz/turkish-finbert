@@ -24,6 +24,13 @@ function validateDate(date) {
   return /^\d{4}-\d{2}-\d{2}$/.test(date);
 }
 
+function allowedChatIds(env) {
+  return (env.TELEGRAM_ALLOWED_CHAT_ID || "")
+    .split(",")
+    .map((chatId) => chatId.trim())
+    .filter(Boolean);
+}
+
 async function sendTelegram(env, chatId, text) {
   const body = new URLSearchParams({
     chat_id: chatId,
@@ -102,8 +109,9 @@ export default {
       return json({ok: true, ignored: true});
     }
 
-    if (env.TELEGRAM_ALLOWED_CHAT_ID && chatId !== env.TELEGRAM_ALLOWED_CHAT_ID) {
-      await sendTelegram(env, chatId, "Bu bot icin yetkin yok.");
+    const allowedIds = allowedChatIds(env);
+    if (allowedIds.length && !allowedIds.includes(chatId)) {
+      await sendTelegram(env, chatId, `Bu bot icin yetkin yok.\nBu chat ID'yi izin listesine ekle: ${chatId}`);
       return json({ok: true, unauthorized_chat: true});
     }
 

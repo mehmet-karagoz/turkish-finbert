@@ -117,7 +117,13 @@ The token from BotFather.
 
 `TELEGRAM_ALLOWED_CHAT_ID`
 
-The only Telegram chat allowed to trigger the workflow.
+Comma-separated Telegram chat IDs allowed to trigger the workflow. This can be a private chat, a group, or both.
+
+Example:
+
+```text
+123456789,-1001234567890
+```
 
 `TELEGRAM_WEBHOOK_SECRET`
 
@@ -194,9 +200,43 @@ Workflow tetiklendi.
 
 After the GitHub workflow finishes, the bot should send the formatted daily report.
 
+## Using Commands From A Telegram Group
+
+Group chat IDs are different from private chat IDs. Telegram supergroup IDs usually start with `-100`.
+
+To allow a group:
+
+1. Add the bot to the group.
+2. Keep the bot as admin if you want it to manage/send messages reliably.
+3. Send `/help` or `/run` in the group.
+4. If the Worker replies `Bu bot icin yetkin yok`, copy the chat ID shown in that message.
+5. Add that group ID to Cloudflare `TELEGRAM_ALLOWED_CHAT_ID`.
+
+If you want both your private chat and the group to work, use comma-separated IDs:
+
+```text
+TELEGRAM_ALLOWED_CHAT_ID=123456789,-1001234567890
+```
+
+After changing the Cloudflare variable, redeploy/save the Worker and send:
+
+```text
+/help
+```
+
+in the group.
+
+If the command is not received in a group, check BotFather privacy mode:
+
+```text
+/setprivacy
+```
+
+Commands such as `/run` usually work with privacy mode enabled, but disabling privacy can help if the group command is not reaching the bot.
+
 ## Security Notes
 
-- Only allow your own chat ID.
+- Only allow your own private chat ID or trusted group IDs.
 - Rotate `GITHUB_TOKEN` if leaked.
 - Rotate `TELEGRAM_BOT_TOKEN` if leaked.
 - Use a strong `TELEGRAM_WEBHOOK_SECRET`.
