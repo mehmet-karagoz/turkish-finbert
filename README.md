@@ -1,357 +1,172 @@
-# Türkçe FinBERT Benzeri BIST Duygu Analizi
+# Turkish FinBERT-Like BIST Sentiment Alerts
 
-Bu proje BIST hisseleri için Türkçe finansal metinlerden `negative / neutral / positive` duygu etiketi üretmek, bu etiketi hisse bazlı sentiment skoruna çevirmek ve basit finansal etki/backtest analizi yapmak için sade bir başlangıç iskeletidir.
+Turkish FinBERT-Like BIST Sentiment Alerts is a research-oriented pipeline for turning Turkish financial disclosures and news into daily BIST stock sentiment alerts.
 
-İlk sürüm iki seviyelidir:
+The project collects KAP/news text, maps it to BIST tickers, scores each text as `negative`, `neutral`, or `positive`, aggregates the result into stock/event-level signals, and sends a compact Telegram report.
 
-- **Hemen çalışan baseline:** TF-IDF + LogisticRegression.
-- **Opsiyonel BERT eğitimi:** `transformers` ve `torch` kuruluysa BERTurk benzeri model fine-tuning.
+> This project is not investment advice. It is an NLP and signal research tool. Every output should be treated as a candidate event for manual review.
 
-## Kurulum
+## What It Does
+
+- Fetches Turkish financial disclosures/news, primarily from KAP-compatible flows.
+- Cleans text and maps company names/tickers.
+- Trains a lightweight baseline sentiment model from labeled Turkish financial examples.
+- Scores new disclosures with class probabilities and sentiment score.
+- Groups repeated or related news into event-level signals.
+- Produces a daily answer to: "Is there anything meaningful today?"
+- Sends a readable Telegram summary automatically.
+- Can be triggered manually from Telegram with commands such as `/run` and `/run 2026-06-07`.
+
+## Current Scope
+
+The repository currently uses a practical baseline model:
+
+- `TF-IDF + LogisticRegression` for the production-friendly baseline.
+- Optional transformer/BERT training is scaffolded for later experiments.
+
+The goal is not to predict prices directly. The goal is to produce a structured daily market/news briefing:
+
+- no important event today,
+- weak signal worth manual review,
+- stock-specific positive/negative event,
+- possible market-wide event,
+- unusual signal compared with historical sentiment.
+
+## Pipeline
+
+```text
+KAP/news fetch
+  -> text cleaning
+  -> ticker/company matching
+  -> sentiment scoring
+  -> daily stock aggregation
+  -> event grouping and priority scoring
+  -> Markdown/CSV/Telegram outputs
+  -> GitHub Actions scheduled deploy
+  -> optional Telegram command trigger via Cloudflare Worker
+```
+
+## Repository Layout
+
+```text
+data/
+  labels/          labeled examples and labeling batches
+  raw/             raw ticker lists, source lists, fetched raw files
+  processed/       prepared/scored/historical CSV outputs
+
+deploy/
+  cloudflare-worker/
+    telegram-workflow-dispatcher.js
+
+docs/
+  wiki/            detailed public documentation pages
+
+reports/
+  daily_alerts/    daily Markdown, Telegram HTML, signal CSV outputs
+  figures/         plots and model diagnostics
+
+src/turkish_fin_bert/
+  fetch_news.py
+  prepare_dataset.py
+  train_model.py
+  score_news.py
+  daily_alerts.py
+  daily_pipeline.py
+```
+
+## Quick Start
+
+Install dependencies:
 
 ```powershell
 uv sync
 ```
 
-Opsiyonel BERT eğitimi için:
+Run tests:
 
 ```powershell
-uv sync --extra nlp
+uv run pytest
 ```
 
-## 1. Gerçek Haber Metni Toplama
-
-RSS/Atom kaynağından haberleri standart ham veri şemasına toplamak için:
+Train the baseline model:
 
 ```powershell
-uv run fetch_news --source rss --rss-url "https://ORNEK-HABER-SITESI/rss" --tickers THYAO ASELS GARAN EREGL --aliases data/raw/company_aliases.csv --out data/raw/news.csv --append --fetch-article-text
+uv run train_model --input data/labels/labeled_news_master.csv --model-out models/master_baseline_sentiment.joblib --report-dir reports/master_baseline --split-strategy stratified
 ```
 
-Projeye eklenmiş gerçek RSS kaynak listesini kullanmak için:
-
-```powershell
-uv run fetch_news --source rss --rss-url-file data/raw/news_rss_sources.txt --tickers-file data/raw/tickers_bist_seed.txt --aliases data/raw/company_aliases.csv --out data/raw/news.csv --append --limit 100
-```
-
-Yerel örnek RSS dosyasıyla internet kullanmadan test etmek için:
-
-```powershell
-uv run fetch_news --source rss --rss-file data/raw/sample_feed.xml --tickers THYAO ASELS EREGL --aliases data/raw/company_aliases.csv --out data/raw/news.csv
-```
-
-KAP bildirim URL'lerini satır satır bir dosyaya koyduktan sonra:
-
-```powershell
-uv run fetch_news --source kap-links --url-file data/raw/kap_links.txt --tickers THYAO ASELS GARAN --aliases data/raw/company_aliases.csv --out data/raw/kap_news.csv --append
-```
-
-KAP'ın web uygulamasında kullanılan bildirim sorgu API'sinden son 30 gün bildirimlerini toplamak için:
-
-```powershell
-uv run fetch_news --source kap-api --tickers-file data/raw/tickers_bist_seed.txt --out data/raw/kap_api_news.csv --kap-days 30 --limit 1000
-```
-
-Çıktı şeması: `date`, `ticker`, `source`, `title`, `text`, `url`, `language`, `published_at`.
-
-Ticker eşleşme kalitesini kontrol etmek için:
-
-```powershell
-uv run audit_aliases --input data/raw/news_all.csv --out-unmatched reports/unmatched_news.csv --out-summary reports/alias_coverage.csv
-```
-
-Not: KAP'ın resmi yüksek yoğunluklu REST veri yayın servisi sözleşme, IP yetkilendirme ve API key gerektirir. Bu yüzden bu proje ilk adımda RSS ve KAP bildirim URL'lerinden metin toplamayı destekler.
-
-## 2. Gerçek Haberleri Etiketleme Havuzuna Çevirme
-
-Toplanan gerçek haberlerden manuel etiketleme için CSV üretmek:
-
-```powershell
-uv run create_labeling_batch --input data/processed/real_scored_news.csv --output data/labels/real_labeling_batch.csv --max-rows 300 --per-ticker 20
-```
-
-Model tahminlerini yardımcı kolon olarak görmek istersen:
-
-```powershell
-uv run create_labeling_batch --input data/processed/real_scored_news.csv --output data/labels/real_labeling_batch.csv --max-rows 300 --per-ticker 20 --include-model-hints
-```
-
-Önceden etiketlenmiş haberleri atlayıp modelin en kararsız kaldığı haberleri seçmek için:
-
-```powershell
-uv run create_labeling_batch --input data/processed/real_model_scored_news.csv --output data/labels/next_labeling_batch.csv --exclude-labeled data/labels/labeled_news_master.csv --strategy uncertain --max-rows 300 --per-ticker 20 --include-model-hints
-```
-
-Negatif sınıf az kaldığında KAP dosyalarından yüksek güvenli negatif örnekleri ayrı toplamak için:
-
-```powershell
-uv run mine_negative_examples --input data/raw/kap_api_negative_mining_2026_q2.csv --exclude-labeled data/labels/labeled_news_master.csv --output data/labels/negative_labeling_batch.csv --max-rows 100
-```
-
-Pozitif sınıfı pay geri alımı, temettü, yeni iş ilişkisi, ihale/sözleşme ve sermaye artırımı gibi yüksek güvenli KAP başlıklarıyla artırmak için:
-
-```powershell
-uv run mine_positive_examples --input data/raw/kap_api_negative_mining_2026_q2.csv --exclude-labeled data/labels/labeled_news_master.csv --output data/labels/positive_labeling_batch.csv --max-rows 80 --per-reason 20
-```
-
-Etiketleme kuralı: `label` kolonuna sadece `negative`, `neutral` veya `positive` yazılır. Yatırımcı açısından şirket değeri/hisse beklentisi için olumlu metinler `positive`, olumsuz metinler `negative`, net yön taşımayanlar `neutral` olmalı.
-
-Etiketleri kontrol etmek için:
-
-```powershell
-uv run create_labeling_batch --input data/labels/real_labeling_batch.csv --validate-only
-```
-
-Etiketlenmiş batch dosyalarını master dosyada toplamak için:
-
-```powershell
-uv run merge_labels --input data/labels/real_labeling_batch.csv --output data/labels/labeled_news_master.csv
-```
-
-Üretilen grafikler:
-
-- `reports/figures/labeling_text_length_distribution.png`: Etiketlenecek metinlerin yeterli bilgi taşıyıp taşımadığını gösterir.
-- `reports/figures/labeling_daily_text_counts.png`: Etiket havuzunun hangi günlerde yoğunlaştığını gösterir.
-- `reports/figures/labeling_source_distribution.png`: Haber kaynaklarının dağılımını gösterir.
-- `reports/figures/labeling_ticker_distribution.png`: Etiketlenecek haberlerin hisselere göre dengesini gösterir.
-- `reports/figures/master_label_distribution.png`: Master etiketli veri setindeki sınıf dengesini gösterir.
-
-## 3. Örnek Etiketli Veri Hazırlama
-
-```powershell
-uv run prepare_dataset --input data/labels/sample_labeled_news.csv --output data/processed/labeled_news.csv --labeled
-```
-
-Üretilen grafikler:
-
-- `reports/figures/label_distribution.png`: Sınıfların dengeli olup olmadığını gösterir.
-- `reports/figures/text_length_distribution.png`: Metinlerin model için yeterli uzunlukta olup olmadığını gösterir.
-- `reports/figures/ticker_label_distribution.png`: Hisse bazında etiket dağılımını gösterir.
-
-Gerçek haberleri model girdisine hazırlamak için:
-
-```powershell
-uv run prepare_dataset --input data/raw/news.csv --output data/processed/news_prepared.csv
-```
-
-Birden fazla KAP/RSS arsivini tek temiz haber dosyasinda birlestirmek icin:
-
-```powershell
-uv run prepare_dataset --input data/raw/kap_api_negative_mining_2025_q1.csv data/raw/kap_api_negative_mining_2025_q2.csv data/raw/kap_api_negative_mining_2025_q3.csv data/raw/kap_api_negative_mining_2025_q4.csv data/raw/kap_api_negative_mining_2026_q1.csv data/raw/kap_api_negative_mining_2026_q2.csv --output data/processed/kap_api_historical_prepared.csv
-```
-
-Gerçek etiketli CSV hazır olduğunda:
-
-```powershell
-uv run prepare_dataset --input data/labels/real_labeling_batch.csv --output data/processed/real_labeled_news.csv --labeled
-```
-
-## 4. Baseline Model Eğitimi
-
-```powershell
-uv run train_model --input data/processed/labeled_news.csv --model-out models/baseline_sentiment.joblib --report-dir reports
-```
-
-Negatif/pozitif/nötr sınıfların validasyon setinde temsil edilmesini istiyorsan:
-
-```powershell
-uv run train_model --input data/processed/labeled_news_master.csv --model-out models/master_baseline_sentiment.joblib --report-dir reports/master_baseline --split-strategy stratified
-```
-
-Üretilen grafikler:
-
-- `reports/figures/confusion_matrix.png`: Modelin hangi sınıfları karıştırdığını gösterir.
-- `reports/figures/class_scores.png`: Sınıf bazlı precision/recall/F1 skorlarını gösterir.
-
-## 5. Haberleri Skorlama
-
-```powershell
-uv run score_news --model models/baseline_sentiment.joblib --input data/processed/labeled_news.csv --out data/processed/scored_news.csv --daily-out data/processed/daily_sentiment.csv
-```
-
-Çıktı mantığı:
-
-- `prob_positive - prob_negative` değeri günlük sentiment skorudur.
-- `sentiment_3d`, `sentiment_7d`, `sentiment_14d` kolonları hisse bazlı hareketli ortalamalardır.
-
-## 6. Gunluk Alarm ve Ranking
-
-KAP'tan gunluk haberleri cekip temizlemek, modeli calistirmak ve ranking/alarm raporunu tek komutla uretmek icin:
-
-```powershell
-uv run daily_pipeline --kap-days 7 --top-n 10 --min-abs-score 0.20
-```
-
-Belirli bir KAP tarih araligi ve rapor tarihi icin:
-
-```powershell
-uv run daily_pipeline --kap-from-date 2026-06-01 --kap-to-date 2026-06-06 --date 2026-06-06 --top-n 10 --min-abs-score 0.20
-```
-
-Gunluk ozet artik bugunku skorun hisse icin gecmise gore olagan mi sira disi mi oldugunu da kontrol eder. Varsayilan karsilastirma son 60 gundur ve en az 5 gecmis gun ister:
-
-```powershell
-uv run daily_pipeline --kap-days 90 --append-raw --baseline-lookback-days 60 --baseline-min-history 5
-```
-
-Gunluk dosyalari ayri tutup historical arsivi kontrollu guncellemek icin `--update-history` kullanilir. Bu mod ham, temiz, skorlanmis ve gunluk sentiment historical CSV'lerini tekrar kayitlari temizleyerek gunceller; ayrica `--baseline-daily-sentiment` verilmediyse baseline olarak guncellenen historical daily sentiment dosyasini kullanir:
+Run the daily pipeline locally:
 
 ```powershell
 uv run daily_pipeline --kap-days 7 --update-history --baseline-lookback-days 365 --baseline-min-history 5
 ```
 
-Elinde onceden skorlanmis historical daily sentiment dosyasi varsa, bugunku raporu bu dosyayi baseline olarak kullanarak uretmek daha dogrudur:
+Generate alerts from already scored files:
 
 ```powershell
-uv run daily_pipeline --kap-days 7 --baseline-daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --baseline-lookback-days 90 --baseline-min-history 5
+uv run daily_alerts --scored-news data/processed/kap_daily_scored_news.csv --daily-sentiment data/processed/kap_daily_sentiment.csv --baseline-daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --out-dir reports/daily_alerts
 ```
 
-Bugun icin en iyi/en kotu hisseleri, en guclu pozitif/negatif haberleri ve piyasa geneli aday haberleri uretmek icin:
+## Outputs
 
-```powershell
-uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
-```
+Daily runs produce files such as:
 
-Bugunku skor dosyasi ayri, gecmis karsilastirma dosyasi ayriysa:
+- `reports/daily_alerts/YYYY-MM-DD_daily_alerts.md`
+- `reports/daily_alerts/YYYY-MM-DD_brief.md`
+- `reports/daily_alerts/YYYY-MM-DD_telegram.html`
+- `reports/daily_alerts/YYYY-MM-DD_event_signals.csv`
+- `reports/daily_alerts/YYYY-MM-DD_signal_baseline.csv`
+- `data/processed/kap_api_historical_daily_sentiment.csv`
 
-```powershell
-uv run daily_alerts --scored-news data/processed/kap_daily_scored_news.csv --daily-sentiment data/processed/kap_daily_sentiment.csv --baseline-daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-06 --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
-```
+Telegram messages use the HTML output so the report is readable on mobile.
 
-Belirli bir tarih icin:
+## Automation
 
-```powershell
-uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-01 --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
-```
-
-Telegram'a gondermek icin token ve chat id ortam degiskeni olarak verilir. Telegram'a detayli rapor yerine kisa ozet metni gonderilir:
-
-```powershell
-$env:TELEGRAM_BOT_TOKEN="BOT_TOKEN"
-$env:TELEGRAM_CHAT_ID="CHAT_ID"
-uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --send-telegram
-```
-
-Uretilen dosyalar: gunluk Markdown raporu, Telegram'a hazir kisa ozet Markdown dosyasi, Telegram HTML mesaji, olay sinyali CSV'si, gecmis karsilastirma/anomali CSV'si, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
-
-Gunluk raporda `Onemli Olay Ozeti` bolumu model skorunu tek basina listelemek yerine haberleri olay seviyesinde gruplar. Bu bolum `materiality_score`, `signal_strength`, olay tipi ve etkilenen ticker listesini kullanarak "bugun anlamli olay var mi, yok mu?" sorusuna daha urun odakli cevap verir.
-
-`Aksiyon Ozeti` bolumu her olayi `takip et`, `detay kontrol et`, `zayif sinyal`, `gecmis veri yetersiz`, `piyasa geneli dikkat` veya `rutin / ignore` gibi karar etiketleriyle aciklar. Bu bolum ayrica `Dagilim: 1 detay kontrol et, 1 gecmis veri yetersiz` gibi gunluk aksiyon sayacini verir. Telegram'a giden kisa ozet ayni karar dilini kullanir, ancak HTML `parse_mode` ile kalin basliklar ve kompakt skor bloklari kullanarak telefon ekraninda daha okunur gonderilir.
-
-Olay sinyali CSV'sinde `priority_score` ve `priority_reason` kolonlari da uretilir. `priority_score` 0-100 arasinda hesaplanir; olay onemi, sentiment siddeti, sinyal gucu, gecmis anomali seviyesi ve aksiyon etiketini birlikte kullanir. Kisa ozet ve detay rapor olaylari bu puana gore siralar.
-
-Kisa ozet `Karar`, `Sonuc`, `Akis` ve `Oncelik seviyesi` satirlariyla "bugun anlamli olay var mi?" sorusunu acik cevaplar. Esik ustu olay yoksa `Bugun aksiyon gerektiren olay yok` ve `Onemli olay yok; takip listesi bos` dilini kullanir; dusuk oncelikli zayif sinyallerde ise bunu manuel kontrol seviyesinde tutar.
-
-`Gecmis Karsilastirma` bolumu rapor tarihinden sonraki veriyi kullanmaz; historical dosyada rapor gunu veya sonrasi satirlar olsa bile baseline icin sadece rapor tarihinden onceki gunler kullanilir. Rapor gununun current satirlari ise `--daily-sentiment` dosyasindan gelir. Kisa ozet bu bilgiyle `gecmise gore olagan`, `gecmise gore dikkat cekici` veya `gecmise gore sira disi` gibi daha okunur karar notlari uretir.
-
-## 7. Ucretsiz GitHub Actions Deploy
-
-Bilgisayari acik birakmadan gunluk rapor uretmek icin `.github/workflows/daily-pipeline.yml` workflow'u kullanilir. Bu workflow her gun Turkiye saatiyle 08:30 ve 18:30'da calisir; ayrica GitHub Actions ekranindan manuel de tetiklenebilir.
-
-Workflow sirasi:
-
-1. Python ve `uv` kurulur.
-2. `data/labels/labeled_news_master.csv` ile model yeniden egitilir.
-3. `daily_pipeline --update-history` calisir.
-4. Gunluk raporlar artifact olarak saklanir.
-5. Historical KAP/sentiment CSV'leri ve `reports/daily_alerts` klasoru repo'ya geri commit edilir.
-
-GitHub'da yapilacaklar:
-
-1. Repository `Settings -> Actions -> General` ekraninda workflow izinlerini `Read and write permissions` yap.
-2. Telegram bildirimi icin `Settings -> Secrets and variables -> Actions` ekranina `TELEGRAM_BOT_TOKEN` ve `TELEGRAM_CHAT_ID` secret'larini ekle.
-3. `Actions -> Daily BIST Sentiment Pipeline -> Run workflow` ile ilk manuel calistirmayi yap.
-4. Calisma bittikten sonra Telegram mesajini, `reports/daily_alerts` klasorundeki yeni brief dosyasini ve workflow artifact'ini kontrol et.
-
-Model dosyalari `.gitignore` icinde oldugu icin workflow modeli her calismada yeniden egitir. Bu sayede `models/*.joblib` dosyasini GitHub'a yuklemek gerekmez.
-
-## 8. Telegram Komutuyla Workflow Tetikleme
-
-Telegram'dan istedigin zaman rapor uretmek icin `deploy/cloudflare-worker/telegram-workflow-dispatcher.js` Cloudflare Worker olarak kullanilir. Bu yapi 7/24 sunucu calistirmadan Telegram webhook'unu karsilar ve GitHub Actions workflow'unu manuel tetikler.
-
-Desteklenen komutlar:
+The repo includes a GitHub Actions workflow:
 
 ```text
-/run
-/run 2026-06-07
-/help
+.github/workflows/daily-pipeline.yml
 ```
 
-`/run` son 7 gunluk normal akisi calistirir. `/run 2026-06-07` secilen gunu `--kap-from-date`, `--kap-to-date` ve `--date` olarak workflow'a yollar.
+It can:
 
-GitHub token:
+- run on a schedule,
+- be triggered manually from GitHub,
+- train the baseline model on the runner,
+- run the daily pipeline,
+- commit updated historical outputs,
+- send the Telegram report.
 
-1. GitHub `Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens` ekranindan token olustur.
-2. Repository access olarak bu repo'yu sec.
-3. Permissions icin `Actions: Read and write`, `Contents: Read-only` yeterlidir.
-
-Cloudflare Worker ayarlari:
-
-1. Cloudflare dashboard'da yeni Worker olustur.
-2. `deploy/cloudflare-worker/telegram-workflow-dispatcher.js` dosyasini Worker kodu olarak yapistir.
-3. Worker Settings ekraninda su secret/variable degerlerini ekle:
+Telegram command triggering is handled by:
 
 ```text
-TELEGRAM_BOT_TOKEN       = Telegram bot token
-TELEGRAM_ALLOWED_CHAT_ID = Sadece izin verilen chat id
-TELEGRAM_WEBHOOK_SECRET  = Rastgele guclu bir secret
-GITHUB_TOKEN             = Fine-grained GitHub token
-GITHUB_OWNER             = GitHub kullanici/organizasyon adi
-GITHUB_REPO              = Repo adi
-GITHUB_REF               = main
+deploy/cloudflare-worker/telegram-workflow-dispatcher.js
 ```
 
-Webhook'u Telegram'a baglamak icin PowerShell:
+This Worker receives Telegram webhook updates and dispatches the GitHub workflow.
 
-```powershell
-$env:BOT_TOKEN="BOT_TOKEN"
-$env:WORKER_URL="https://WORKER_ADI.KULLANICI.workers.dev"
-$env:WEBHOOK_SECRET="TELEGRAM_WEBHOOK_SECRET"
-curl.exe -X POST "https://api.telegram.org/bot$env:BOT_TOKEN/setWebhook" -d "url=$env:WORKER_URL" -d "secret_token=$env:WEBHOOK_SECRET"
-```
+## Documentation
 
-Kurulumdan sonra Telegram'da `/run` veya `/run 2026-06-07` yazmak GitHub Actions workflow'unu tetikler. Workflow bitince mevcut Telegram rapor gonderim adimi sonucu yine bot mesaj olarak yollar.
+Detailed docs are split into wiki-style pages:
 
-## 9. Fiyat Verisi
+- [Wiki Home](docs/wiki/Home.md)
+- [Project Purpose](docs/wiki/01-Project-Purpose.md)
+- [Installation and Quick Start](docs/wiki/02-Installation-and-Quick-Start.md)
+- [Data, Labeling, and Model](docs/wiki/03-Data-Labeling-and-Model.md)
+- [Daily Signal Logic](docs/wiki/04-Daily-Signal-Logic.md)
+- [GitHub Actions Deployment](docs/wiki/05-GitHub-Actions-Deployment.md)
+- [Telegram Bot and Commands](docs/wiki/06-Telegram-Bot-and-Commands.md)
+- [Operations and Troubleshooting](docs/wiki/07-Operations-and-Troubleshooting.md)
+- [Public Repo Checklist](docs/wiki/08-Public-Repo-Checklist.md)
 
-```powershell
-uv run fetch_data --tickers THYAO ASELS GARAN --start 2022-01-01 --out data/raw/prices.csv
-```
+These files can also be copied into a GitHub Wiki if you prefer the repository Wiki UI.
 
-Geniş seed listesinden fiyat çekmek için:
+## Safety Notes
 
-```powershell
-uv run fetch_data --tickers-file data/raw/tickers_bist_seed.txt --start 2025-01-01 --out data/raw/bist_prices_extended.csv
-```
+- Do not commit Telegram tokens, GitHub tokens, or webhook secrets.
+- Keep secrets in GitHub Actions Secrets or Cloudflare Worker Secrets.
+- Historical CSV files are research artifacts; review size and content before making the repo public.
+- The labels and baseline model are early-stage and should be improved before relying on outputs operationally.
 
-Not: BIST sembollerine otomatik `.IS` eki eklenir; `--tickers` ve `--tickers-file` birlikte kullanılabilir.
+## License
 
-## 10. Finansal Etki Analizi
-
-```powershell
-uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --out reports/financial_effect.csv
-```
-
-Üretilen grafikler:
-
-- `reports/figures/sentiment_bucket_returns.png`: Sentiment seviyesi arttıkça ileri getiri değişiyor mu gösterir.
-- `reports/figures/sentiment_return_correlation.png`: Sentiment ile 1/5/20 günlük ileri getiriler arasındaki ilişkiyi gösterir.
-- `reports/figures/price_sentiment_<TICKER>.png`: Hisse fiyatı ile sentiment skorunu birlikte gösterir.
-
-## 11. Basit Backtest
-
-```powershell
-uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --top-n 5 --rebalance-months 3 --out reports/backtest_equity.csv
-```
-
-Üretilen grafikler:
-
-- `reports/figures/backtest_equity.png`: Strateji ile eşit ağırlıklı benchmark kümülatif getirisi.
-- `reports/figures/backtest_drawdown.png`: Stratejinin maksimum düşüş dönemleri.
-
-## 12. Opsiyonel BERT Fine-Tuning
-
-```powershell
-uv run train_transformer --input data/processed/labeled_news.csv --model-name dbmdz/bert-base-turkish-cased --output-dir models/berturk_sentiment
-```
-
-Bu komut daha güçlüdür ama daha ağırdır. İlk araştırma için baseline model metrikleri ve finansal etki grafikleri yeterli başlangıç sağlar.
+Add a license before publishing the repository publicly.
