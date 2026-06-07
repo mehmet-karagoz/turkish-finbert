@@ -7,12 +7,13 @@ This page lists practical checks for running the project.
 Normal operation:
 
 ```text
-1. GitHub Actions runs on schedule.
-2. Model trains in the runner.
-3. KAP/news data is fetched.
-4. Daily alerts are generated.
-5. Telegram report is sent.
-6. Historical outputs are committed back.
+1. Cloudflare Cron Trigger runs the Worker.
+2. Worker dispatches GitHub Actions.
+3. Model trains in the runner.
+4. KAP/news data is fetched.
+5. Daily alerts are generated.
+6. Telegram report is sent.
+7. Historical outputs are committed back.
 ```
 
 Manual operation:
@@ -33,10 +34,23 @@ GitHub Actions -> Run workflow
 Check GitHub Actions:
 
 - run is green,
+- event is `workflow_dispatch`,
 - `Train deploy model` passed,
 - `Run daily pipeline` passed,
 - `Send Telegram brief` passed,
 - commit step did not fail.
+
+Check Cloudflare scheduled runs:
+
+- Worker has Cron Triggers:
+
+```text
+30 5 * * *
+30 15 * * *
+```
+
+- Cloudflare Worker logs show the scheduled event.
+- GitHub Actions has a new `workflow_dispatch` run shortly after the cron time.
 
 Check Telegram:
 
@@ -76,6 +90,31 @@ Check:
 - `TELEGRAM_WEBHOOK_SECRET` matches between Telegram webhook and Cloudflare.
 - `GITHUB_TOKEN` has `Actions: Read and write`.
 - `GITHUB_OWNER`, `GITHUB_REPO`, and `GITHUB_REF` are correct.
+
+### Automatic daily run does not start
+
+Check:
+
+- Cloudflare Worker has Cron Triggers configured.
+- Cron expressions are UTC, not Turkey time.
+- Worker environment has `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO`, and `GITHUB_REF`.
+- `GITHUB_TOKEN` has `Actions: Read and write`.
+- GitHub Actions workflow is active.
+
+Expected daily times:
+
+```text
+08:30 Turkey time
+18:30 Turkey time
+```
+
+In GitHub Actions, automatic runs triggered by Cloudflare still appear as:
+
+```text
+workflow_dispatch
+```
+
+because the Worker calls GitHub's workflow dispatch API.
 
 ### Worker says unauthorized
 

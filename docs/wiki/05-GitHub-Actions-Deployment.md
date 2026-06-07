@@ -4,16 +4,17 @@ This page explains how to run the project without keeping a local computer open.
 
 ## Why GitHub Actions
 
-This project does not need a 24/7 web server for the daily report. It needs a scheduled job.
+This project does not need a 24/7 web server for the daily report. It needs a workflow runner and a scheduler.
 
 GitHub Actions is suitable because it can:
 
-- run on a schedule,
 - run on manual trigger,
 - train the baseline model on each run,
 - fetch and score new data,
 - send Telegram output,
 - commit updated historical files.
+
+Daily scheduling is handled by the Cloudflare Worker cron trigger. The Worker calls GitHub Actions through `workflow_dispatch`. This keeps manual Telegram commands and automatic daily runs on the same trigger path.
 
 ## Workflow File
 
@@ -24,11 +25,24 @@ GitHub Actions is suitable because it can:
 Main triggers:
 
 ```text
-schedule
 workflow_dispatch
 ```
 
-Scheduled times are defined in UTC. The current workflow comments map them to Turkey time.
+The workflow intentionally does not use GitHub's native `schedule` trigger. Scheduled execution is configured in Cloudflare.
+
+Cloudflare cron values:
+
+```text
+30 5 * * *
+30 15 * * *
+```
+
+These are UTC times:
+
+```text
+05:30 UTC = 08:30 Turkey time
+15:30 UTC = 18:30 Turkey time
+```
 
 ## Workflow Inputs
 
@@ -152,6 +166,40 @@ For a specific date:
 ```text
 report_date = 2026-06-07
 ```
+
+## Automatic Run From Cloudflare
+
+The Worker file is:
+
+```text
+deploy/cloudflare-worker/telegram-workflow-dispatcher.js
+```
+
+It supports both:
+
+- Telegram webhook commands through `fetch()`,
+- scheduled daily dispatch through `scheduled()`.
+
+If using Wrangler, copy:
+
+```text
+deploy/cloudflare-worker/wrangler.toml.example
+```
+
+to:
+
+```text
+deploy/cloudflare-worker/wrangler.toml
+```
+
+and keep the cron section:
+
+```toml
+[triggers]
+crons = ["30 5 * * *", "30 15 * * *"]
+```
+
+If using the Cloudflare dashboard, add the same two cron triggers under the Worker settings.
 
 ## Expected Result
 

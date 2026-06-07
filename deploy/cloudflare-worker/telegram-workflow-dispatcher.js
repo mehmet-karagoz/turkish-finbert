@@ -55,7 +55,6 @@ async function dispatchWorkflow(env, reportDate, telegramChatId) {
     "GITHUB_TOKEN",
     "GITHUB_OWNER",
     "GITHUB_REPO",
-    "TELEGRAM_BOT_TOKEN",
   ]);
 
   const workflowFile = env.GITHUB_WORKFLOW_FILE || "daily-pipeline.yml";
@@ -88,7 +87,28 @@ async function dispatchWorkflow(env, reportDate, telegramChatId) {
   return {ref, inputs};
 }
 
+function scheduledTelegramChatId(env) {
+  return env.SCHEDULED_TELEGRAM_CHAT_ID || env.TELEGRAM_CHAT_ID || "";
+}
+
+async function dispatchScheduledWorkflow(env) {
+  const chatId = scheduledTelegramChatId(env);
+  try {
+    return await dispatchWorkflow(env, "", chatId);
+  } catch (error) {
+    console.error(error);
+    if (chatId && env.TELEGRAM_BOT_TOKEN) {
+      await sendTelegram(env, chatId, `Otomatik workflow tetiklenemedi: ${error.message}`);
+    }
+    throw error;
+  }
+}
+
 export default {
+  scheduled(event, env, ctx) {
+    ctx.waitUntil(dispatchScheduledWorkflow(env));
+  },
+
   async fetch(request, env) {
     if (request.method === "GET") {
       return new Response(HELP_TEXT, {headers: {"content-type": "text/plain; charset=utf-8"}});

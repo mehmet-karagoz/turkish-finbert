@@ -1,10 +1,6 @@
 name: Daily BIST Sentiment Pipeline
 
 on:
-  schedule:
-    # Turkey time is UTC+3. These run at 08:30 and 18:30 Turkey time.
-    - cron: "30 5 * * *"
-    - cron: "30 15 * * *"
   workflow_dispatch:
     inputs:
       kap_days:

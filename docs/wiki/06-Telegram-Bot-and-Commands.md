@@ -72,6 +72,16 @@ Worker file:
 deploy/cloudflare-worker/telegram-workflow-dispatcher.js
 ```
 
+The same Worker can also run automatically with Cloudflare Cron Triggers:
+
+```text
+Cloudflare Cron Trigger
+  -> Cloudflare Worker scheduled()
+  -> GitHub workflow_dispatch API
+  -> GitHub Actions daily pipeline
+  -> Telegram report
+```
+
 ## Supported Commands
 
 ```text
@@ -109,6 +119,8 @@ GITHUB_WORKFLOW_FILE = daily-pipeline.yml
 DEFAULT_KAP_DAYS = 7
 DEFAULT_BASELINE_LOOKBACK_DAYS = 365
 DEFAULT_BASELINE_MIN_HISTORY = 5
+SCHEDULED_TELEGRAM_CHAT_ID = -1001234567890
+TELEGRAM_CHAT_ID = -1001234567890
 ```
 
 ## What Each Value Means
@@ -161,6 +173,40 @@ Usually:
 ```text
 main
 ```
+
+`SCHEDULED_TELEGRAM_CHAT_ID`
+
+Optional target chat ID for automatic Cloudflare cron runs. Use the group ID if daily reports should go to a group.
+
+If this is empty, the Worker dispatches the workflow without a chat override and GitHub Actions falls back to its repository secret:
+
+```text
+TELEGRAM_CHAT_ID
+```
+
+## Automatic Daily Schedule
+
+Add these Cloudflare Cron Triggers to the Worker:
+
+```text
+30 5 * * *
+30 15 * * *
+```
+
+Cloudflare cron times are UTC:
+
+```text
+05:30 UTC = 08:30 Turkey time
+15:30 UTC = 18:30 Turkey time
+```
+
+If you deploy with Wrangler, use:
+
+```text
+deploy/cloudflare-worker/wrangler.toml.example
+```
+
+as the template. If you use the Cloudflare dashboard, add the same cron values from the Worker settings page.
 
 ## Set Telegram Webhook
 

@@ -57,8 +57,8 @@ It does not try to predict prices directly. Instead, it helps detect:
 | Event aggregation | Groups daily news into stock/event-level signals |
 | Historical comparison | Compares current sentiment with historical baselines |
 | Telegram reports | Sends compact mobile-friendly summaries |
-| GitHub Actions automation | Runs the daily pipeline on schedule or manually |
-| Cloudflare Worker trigger | Allows Telegram command-based workflow dispatch |
+| GitHub Actions automation | Runs the daily pipeline manually or by API dispatch |
+| Cloudflare Worker trigger | Allows Telegram command-based and scheduled workflow dispatch |
 
 ---
 
@@ -72,8 +72,8 @@ KAP/news fetch
   -> daily stock aggregation
   -> event grouping and priority scoring
   -> Markdown / CSV / Telegram outputs
-  -> GitHub Actions scheduled run
-  -> optional Telegram command trigger
+  -> Cloudflare cron or Telegram command trigger
+  -> GitHub Actions workflow_dispatch run
 ```
 
 ---
@@ -274,7 +274,6 @@ The repository includes a GitHub Actions workflow:
 
 It can:
 
-- run automatically on schedule,
 - be triggered manually from GitHub,
 - train the baseline model,
 - run the daily sentiment pipeline,
@@ -300,6 +299,8 @@ deploy/cloudflare-worker/telegram-workflow-dispatcher.js
 ```
 
 The Worker receives Telegram webhook updates and dispatches the GitHub Actions workflow.
+
+The same Worker can also run the daily schedule with Cloudflare Cron Triggers.
 
 Supported command style:
 
