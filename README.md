@@ -187,10 +187,34 @@ Belirli bir KAP tarih araligi ve rapor tarihi icin:
 uv run daily_pipeline --kap-from-date 2026-06-01 --kap-to-date 2026-06-06 --date 2026-06-06 --top-n 10 --min-abs-score 0.20
 ```
 
+Gunluk ozet artik bugunku skorun hisse icin gecmise gore olagan mi sira disi mi oldugunu da kontrol eder. Varsayilan karsilastirma son 60 gundur ve en az 5 gecmis gun ister:
+
+```powershell
+uv run daily_pipeline --kap-days 90 --append-raw --baseline-lookback-days 60 --baseline-min-history 5
+```
+
+Gunluk dosyalari ayri tutup historical arsivi kontrollu guncellemek icin `--update-history` kullanilir. Bu mod ham, temiz, skorlanmis ve gunluk sentiment historical CSV'lerini tekrar kayitlari temizleyerek gunceller; ayrica `--baseline-daily-sentiment` verilmediyse baseline olarak guncellenen historical daily sentiment dosyasini kullanir:
+
+```powershell
+uv run daily_pipeline --kap-days 7 --update-history --baseline-lookback-days 365 --baseline-min-history 5
+```
+
+Elinde onceden skorlanmis historical daily sentiment dosyasi varsa, bugunku raporu bu dosyayi baseline olarak kullanarak uretmek daha dogrudur:
+
+```powershell
+uv run daily_pipeline --kap-days 7 --baseline-daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --baseline-lookback-days 90 --baseline-min-history 5
+```
+
 Bugun icin en iyi/en kotu hisseleri, en guclu pozitif/negatif haberleri ve piyasa geneli aday haberleri uretmek icin:
 
 ```powershell
 uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
+```
+
+Bugunku skor dosyasi ayri, gecmis karsilastirma dosyasi ayriysa:
+
+```powershell
+uv run daily_alerts --scored-news data/processed/kap_daily_scored_news.csv --daily-sentiment data/processed/kap_daily_sentiment.csv --baseline-daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-06 --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
 ```
 
 Belirli bir tarih icin:
@@ -199,7 +223,7 @@ Belirli bir tarih icin:
 uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --date 2026-06-01 --out-dir reports/daily_alerts --top-n 10 --min-abs-score 0.20
 ```
 
-Telegram'a gondermek icin token ve chat id ortam degiskeni olarak verilir:
+Telegram'a gondermek icin token ve chat id ortam degiskeni olarak verilir. Telegram'a detayli rapor yerine kisa ozet metni gonderilir:
 
 ```powershell
 $env:TELEGRAM_BOT_TOKEN="BOT_TOKEN"
@@ -207,9 +231,17 @@ $env:TELEGRAM_CHAT_ID="CHAT_ID"
 uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --send-telegram
 ```
 
-Uretilen dosyalar: gunluk Markdown raporu, olay sinyali CSV'si, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
+Uretilen dosyalar: gunluk Markdown raporu, Telegram'a hazir kisa ozet Markdown dosyasi, olay sinyali CSV'si, gecmis karsilastirma/anomali CSV'si, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
 
 Gunluk raporda `Onemli Olay Ozeti` bolumu model skorunu tek basina listelemek yerine haberleri olay seviyesinde gruplar. Bu bolum `materiality_score`, `signal_strength`, olay tipi ve etkilenen ticker listesini kullanarak "bugun anlamli olay var mi, yok mu?" sorusuna daha urun odakli cevap verir.
+
+`Aksiyon Ozeti` bolumu her olayi `takip et`, `detay kontrol et`, `zayif sinyal`, `gecmis veri yetersiz`, `piyasa geneli dikkat` veya `rutin / ignore` gibi karar etiketleriyle aciklar. Bu bolum ayrica `Dagilim: 1 detay kontrol et, 1 gecmis veri yetersiz` gibi gunluk aksiyon sayacini verir. Telegram'a giden kisa ozet ayni `Aksiyon`, `Neden` ve `Aksiyonlar` dilini kullanir, ancak izlenecek satirlarini telefon ekraninda okunacak sekilde kisa tutar: `BJKAS: Oncelik: 36/100 | Aksiyon: detay kontrol et | pozitif zayif +0.22 | yonetim/organizasyon | Neden: yonetim haberi; gecmise gore dikkat cekici.`
+
+Olay sinyali CSV'sinde `priority_score` ve `priority_reason` kolonlari da uretilir. `priority_score` 0-100 arasinda hesaplanir; olay onemi, sentiment siddeti, sinyal gucu, gecmis anomali seviyesi ve aksiyon etiketini birlikte kullanir. Kisa ozet ve detay rapor olaylari bu puana gore siralar.
+
+Kisa ozet `Karar`, `Sonuc`, `Akis` ve `Oncelik seviyesi` satirlariyla "bugun anlamli olay var mi?" sorusunu acik cevaplar. Esik ustu olay yoksa `Bugun aksiyon gerektiren olay yok` ve `Onemli olay yok; takip listesi bos` dilini kullanir; dusuk oncelikli zayif sinyallerde ise bunu manuel kontrol seviyesinde tutar.
+
+`Gecmis Karsilastirma` bolumu rapor tarihinden sonraki veriyi kullanmaz; historical dosyada rapor gunu veya sonrasi satirlar olsa bile baseline icin sadece rapor tarihinden onceki gunler kullanilir. Rapor gununun current satirlari ise `--daily-sentiment` dosyasindan gelir. Kisa ozet bu bilgiyle `gecmise gore olagan`, `gecmise gore dikkat cekici` veya `gecmise gore sira disi` gibi daha okunur karar notlari uretir.
 
 ## 7. Fiyat Verisi
 

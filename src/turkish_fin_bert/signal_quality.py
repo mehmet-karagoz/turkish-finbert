@@ -6,7 +6,21 @@ import unicodedata
 import pandas as pd
 
 
+REPORTABLE_ROUTINE_MATERIALITY = 0.60
+
 EVENT_TYPES = [
+    (
+        "routine",
+        0.10,
+        [
+            "sirket genel bilgi formu",
+            "kurumsal yonetim bilgi formu",
+            "bilgilendirme politikasi",
+            "hak kullanimi",
+            "fon kullanimi",
+            "genel kurul islemlerine iliskin bildirim",
+        ],
+    ),
     (
         "debt_credit",
         1.00,
@@ -42,8 +56,10 @@ EVENT_TYPES = [
             "bedelli",
             "bedelsiz",
             "geri alim",
+            "pay geri alim",
             "pay alimi",
             "pay satimi",
+            "kayitli sermaye tavani",
         ],
     ),
     (
@@ -55,6 +71,7 @@ EVENT_TYPES = [
             "kar veya zarar",
             "faaliyet raporu",
             "gelir tablosu",
+            "finansal rapor",
         ],
     ),
     (
@@ -65,6 +82,7 @@ EVENT_TYPES = [
             "ihale",
             "is iliskisi",
             "siparis",
+            "yeni is",
         ],
     ),
     (
@@ -76,16 +94,7 @@ EVENT_TYPES = [
             "istifa",
             "genel mudur",
             "yonetim kurulu",
-        ],
-    ),
-    (
-        "routine",
-        0.25,
-        [
-            "sirket genel bilgi formu",
-            "kurumsal yonetim bilgi formu",
-            "hak kullanimi",
-            "fon kullanimi",
+            "teknik yonetim",
         ],
     ),
 ]
@@ -164,6 +173,14 @@ def signal_strength(materiality: float, score: float, min_abs_score: float) -> s
     if materiality >= 0.50:
         return "medium"
     return "weak"
+
+
+def is_reportable_event(event_type: str, materiality: float, score: float, min_abs_score: float) -> bool:
+    if abs(score) < min_abs_score:
+        return False
+    if event_type == "routine" and materiality < REPORTABLE_ROUTINE_MATERIALITY:
+        return False
+    return True
 
 
 def materiality_score(
@@ -245,7 +262,17 @@ def build_event_signals(news_day: pd.DataFrame, min_abs_score: float = 0.20, top
         )
 
     events = pd.DataFrame(rows)
-    events = events[events["signal_strength"].ne("none")]
+    events = events[
+        events.apply(
+            lambda row: is_reportable_event(
+                str(row["event_type"]),
+                float(row["materiality_score"]),
+                float(row["avg_impact_score"]),
+                min_abs_score,
+            ),
+            axis=1,
+        )
+    ]
     if events.empty:
         return events
     return events.sort_values(

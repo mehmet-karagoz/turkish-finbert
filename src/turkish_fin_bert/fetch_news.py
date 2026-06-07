@@ -223,6 +223,7 @@ def detect_tickers(text: str, tickers: list[str], aliases: dict[str, list[str]] 
 
 
 def normalize_for_match(value: str) -> str:
+    value = clean_text(value).translate(str.maketrans({"ı": "i", "İ": "I"}))
     ascii_text = unicodedata.normalize("NFKD", value.translate(TURKISH_TRANSLATION))
     ascii_text = "".join(char for char in ascii_text if not unicodedata.combining(char))
     ascii_text = re.sub(r"[^A-Za-z0-9]+", " ", ascii_text)
