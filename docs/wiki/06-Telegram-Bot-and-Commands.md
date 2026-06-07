@@ -86,6 +86,8 @@ Behavior:
 - `/run 2026-06-07`: triggers workflow for a selected report date.
 - `/help`: shows command help.
 
+When `/run` is sent from an allowed group, the final report is sent back to that same group. When it is sent from a private chat, the final report is sent back to that private chat.
+
 ## Cloudflare Worker Variables And Secrets
 
 Required:
@@ -199,6 +201,8 @@ Workflow tetiklendi.
 ```
 
 After the GitHub workflow finishes, the bot should send the formatted daily report.
+
+If the command was sent from a group, the final report should also arrive in the group. The Worker passes the source chat ID to GitHub Actions as `telegram_chat_id`.
 
 ## Using Commands From A Telegram Group
 

@@ -39,6 +39,7 @@ kap_days
 baseline_lookback_days
 baseline_min_history
 report_date
+telegram_chat_id
 ```
 
 If `report_date` is empty, the workflow runs the normal recent-data flow.
@@ -49,6 +50,12 @@ If `report_date` is set, the workflow passes:
 --kap-from-date REPORT_DATE
 --kap-to-date REPORT_DATE
 --date REPORT_DATE
+```
+
+If `telegram_chat_id` is set, the final Telegram report is sent to that chat. If it is empty, the workflow uses the repository secret:
+
+```text
+TELEGRAM_CHAT_ID
 ```
 
 ## Required GitHub Settings

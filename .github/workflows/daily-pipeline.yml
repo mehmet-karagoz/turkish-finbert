@@ -23,6 +23,10 @@ on:
         description: "Istege bagli rapor tarihi. Ornek: 2026-06-07"
         required: false
         default: ""
+      telegram_chat_id:
+        description: "Istege bagli hedef Telegram chat id. Bos ise TELEGRAM_CHAT_ID secret kullanilir."
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -96,7 +100,7 @@ jobs:
       - name: Send Telegram brief
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_CHAT_ID: ${{ github.event.inputs.telegram_chat_id || secrets.TELEGRAM_CHAT_ID }}
         run: |
           if [ -z "$TELEGRAM_BOT_TOKEN" ] || [ -z "$TELEGRAM_CHAT_ID" ]; then
             echo "Telegram secrets are not set. Skipping Telegram send."

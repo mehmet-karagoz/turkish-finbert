@@ -50,7 +50,7 @@ function requireEnv(env, names) {
   }
 }
 
-async function dispatchWorkflow(env, reportDate) {
+async function dispatchWorkflow(env, reportDate, telegramChatId) {
   requireEnv(env, [
     "GITHUB_TOKEN",
     "GITHUB_OWNER",
@@ -65,6 +65,7 @@ async function dispatchWorkflow(env, reportDate) {
     baseline_lookback_days: env.DEFAULT_BASELINE_LOOKBACK_DAYS || "365",
     baseline_min_history: env.DEFAULT_BASELINE_MIN_HISTORY || "5",
     report_date: reportDate || "",
+    telegram_chat_id: telegramChatId || "",
   };
   const response = await fetch(
     `https://api.github.com/repos/${env.GITHUB_OWNER}/${env.GITHUB_REPO}/actions/workflows/${workflowFile}/dispatches`,
@@ -130,7 +131,7 @@ export default {
     }
 
     try {
-      const result = await dispatchWorkflow(env, date);
+      const result = await dispatchWorkflow(env, date, chatId);
       const suffix = date ? `Rapor tarihi: ${date}` : "Rapor tarihi: son veri gunu";
       await sendTelegram(env, chatId, `Workflow tetiklendi.\n${suffix}\nRef: ${result.ref}`);
       return json({ok: true, dispatched: result});
