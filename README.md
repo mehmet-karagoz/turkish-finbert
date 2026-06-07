@@ -370,21 +370,6 @@ Detailed documentation is available under `docs/wiki`:
 
 ---
 
-## Roadmap
-
-- [ ] Improve Turkish financial text normalization
-- [ ] Expand labeled Turkish financial sentiment dataset
-- [ ] Add model evaluation tables to README
-- [ ] Add sample screenshots of Telegram reports
-- [ ] Compare baseline model with transformer-based models
-- [ ] Improve ticker/company alias matching
-- [ ] Add richer backtesting notebooks
-- [ ] Add Docker-based deployment option
-- [ ] Publish model card and dataset documentation
-- [ ] Add license and contribution guide
-
----
-
 ## Limitations
 
 This project has several important limitations:
