@@ -264,7 +264,54 @@ GitHub'da yapilacaklar:
 
 Model dosyalari `.gitignore` icinde oldugu icin workflow modeli her calismada yeniden egitir. Bu sayede `models/*.joblib` dosyasini GitHub'a yuklemek gerekmez.
 
-## 8. Fiyat Verisi
+## 8. Telegram Komutuyla Workflow Tetikleme
+
+Telegram'dan istedigin zaman rapor uretmek icin `deploy/cloudflare-worker/telegram-workflow-dispatcher.js` Cloudflare Worker olarak kullanilir. Bu yapi 7/24 sunucu calistirmadan Telegram webhook'unu karsilar ve GitHub Actions workflow'unu manuel tetikler.
+
+Desteklenen komutlar:
+
+```text
+/run
+/run 2026-06-07
+/help
+```
+
+`/run` son 7 gunluk normal akisi calistirir. `/run 2026-06-07` secilen gunu `--kap-from-date`, `--kap-to-date` ve `--date` olarak workflow'a yollar.
+
+GitHub token:
+
+1. GitHub `Settings -> Developer settings -> Personal access tokens -> Fine-grained tokens` ekranindan token olustur.
+2. Repository access olarak bu repo'yu sec.
+3. Permissions icin `Actions: Read and write`, `Contents: Read-only` yeterlidir.
+
+Cloudflare Worker ayarlari:
+
+1. Cloudflare dashboard'da yeni Worker olustur.
+2. `deploy/cloudflare-worker/telegram-workflow-dispatcher.js` dosyasini Worker kodu olarak yapistir.
+3. Worker Settings ekraninda su secret/variable degerlerini ekle:
+
+```text
+TELEGRAM_BOT_TOKEN       = Telegram bot token
+TELEGRAM_ALLOWED_CHAT_ID = Sadece izin verilen chat id
+TELEGRAM_WEBHOOK_SECRET  = Rastgele guclu bir secret
+GITHUB_TOKEN             = Fine-grained GitHub token
+GITHUB_OWNER             = GitHub kullanici/organizasyon adi
+GITHUB_REPO              = Repo adi
+GITHUB_REF               = main
+```
+
+Webhook'u Telegram'a baglamak icin PowerShell:
+
+```powershell
+$env:BOT_TOKEN="BOT_TOKEN"
+$env:WORKER_URL="https://WORKER_ADI.KULLANICI.workers.dev"
+$env:WEBHOOK_SECRET="TELEGRAM_WEBHOOK_SECRET"
+curl.exe -X POST "https://api.telegram.org/bot$env:BOT_TOKEN/setWebhook" -d "url=$env:WORKER_URL" -d "secret_token=$env:WEBHOOK_SECRET"
+```
+
+Kurulumdan sonra Telegram'da `/run` veya `/run 2026-06-07` yazmak GitHub Actions workflow'unu tetikler. Workflow bitince mevcut Telegram rapor gonderim adimi sonucu yine bot mesaj olarak yollar.
+
+## 9. Fiyat Verisi
 
 ```powershell
 uv run fetch_data --tickers THYAO ASELS GARAN --start 2022-01-01 --out data/raw/prices.csv
@@ -278,7 +325,7 @@ uv run fetch_data --tickers-file data/raw/tickers_bist_seed.txt --start 2025-01-
 
 Not: BIST sembollerine otomatik `.IS` eki eklenir; `--tickers` ve `--tickers-file` birlikte kullanılabilir.
 
-## 9. Finansal Etki Analizi
+## 10. Finansal Etki Analizi
 
 ```powershell
 uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --out reports/financial_effect.csv
@@ -290,7 +337,7 @@ uv run analyze_financial_effect --sentiment data/processed/daily_sentiment.csv -
 - `reports/figures/sentiment_return_correlation.png`: Sentiment ile 1/5/20 günlük ileri getiriler arasındaki ilişkiyi gösterir.
 - `reports/figures/price_sentiment_<TICKER>.png`: Hisse fiyatı ile sentiment skorunu birlikte gösterir.
 
-## 10. Basit Backtest
+## 11. Basit Backtest
 
 ```powershell
 uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw/sample_prices.csv --top-n 5 --rebalance-months 3 --out reports/backtest_equity.csv
@@ -301,7 +348,7 @@ uv run backtest --sentiment data/processed/daily_sentiment.csv --prices data/raw
 - `reports/figures/backtest_equity.png`: Strateji ile eşit ağırlıklı benchmark kümülatif getirisi.
 - `reports/figures/backtest_drawdown.png`: Stratejinin maksimum düşüş dönemleri.
 
-## 10. Opsiyonel BERT Fine-Tuning
+## 12. Opsiyonel BERT Fine-Tuning
 
 ```powershell
 uv run train_transformer --input data/processed/labeled_news.csv --model-name dbmdz/bert-base-turkish-cased --output-dir models/berturk_sentiment

@@ -19,6 +19,10 @@ on:
         description: "Anomali icin minimum gecmis gun sayisi"
         required: false
         default: "5"
+      report_date:
+        description: "Istege bagli rapor tarihi. Ornek: 2026-06-07"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -64,16 +68,30 @@ jobs:
           KAP_DAYS: ${{ github.event.inputs.kap_days }}
           BASELINE_LOOKBACK_DAYS: ${{ github.event.inputs.baseline_lookback_days }}
           BASELINE_MIN_HISTORY: ${{ github.event.inputs.baseline_min_history }}
+          REPORT_DATE: ${{ github.event.inputs.report_date }}
         run: |
           KAP_DAYS="${KAP_DAYS:-7}"
           BASELINE_LOOKBACK_DAYS="${BASELINE_LOOKBACK_DAYS:-365}"
           BASELINE_MIN_HISTORY="${BASELINE_MIN_HISTORY:-5}"
+          REPORT_DATE="${REPORT_DATE:-}"
 
-          uv run daily_pipeline \
-            --kap-days "$KAP_DAYS" \
-            --update-history \
-            --baseline-lookback-days "$BASELINE_LOOKBACK_DAYS" \
+          COMMAND=(
+            uv run daily_pipeline
+            --kap-days "$KAP_DAYS"
+            --update-history
+            --baseline-lookback-days "$BASELINE_LOOKBACK_DAYS"
             --baseline-min-history "$BASELINE_MIN_HISTORY"
+          )
+
+          if [ -n "$REPORT_DATE" ]; then
+            COMMAND+=(
+              --kap-from-date "$REPORT_DATE"
+              --kap-to-date "$REPORT_DATE"
+              --date "$REPORT_DATE"
+            )
+          fi
+
+          "${COMMAND[@]}"
 
       - name: Send Telegram brief
         env:
