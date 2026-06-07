@@ -156,17 +156,4 @@ Detailed docs are split into wiki-style pages:
 - [GitHub Actions Deployment](docs/wiki/05-GitHub-Actions-Deployment.md)
 - [Telegram Bot and Commands](docs/wiki/06-Telegram-Bot-and-Commands.md)
 - [Operations and Troubleshooting](docs/wiki/07-Operations-and-Troubleshooting.md)
-- [Public Repo Checklist](docs/wiki/08-Public-Repo-Checklist.md)
 
-These files can also be copied into a GitHub Wiki if you prefer the repository Wiki UI.
-
-## Safety Notes
-
-- Do not commit Telegram tokens, GitHub tokens, or webhook secrets.
-- Keep secrets in GitHub Actions Secrets or Cloudflare Worker Secrets.
-- Historical CSV files are research artifacts; review size and content before making the repo public.
-- The labels and baseline model are early-stage and should be improved before relying on outputs operationally.
-
-## License
-
-Add a license before publishing the repository publicly.

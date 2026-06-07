@@ -11,7 +11,6 @@ This wiki explains how to use, operate, and extend the Turkish FinBERT-Like BIST
 5. [GitHub Actions Deployment](05-GitHub-Actions-Deployment.md)
 6. [Telegram Bot and Commands](06-Telegram-Bot-and-Commands.md)
 7. [Operations and Troubleshooting](07-Operations-and-Troubleshooting.md)
-8. [Public Repo Checklist](08-Public-Repo-Checklist.md)
 
 ## Short Summary
 
