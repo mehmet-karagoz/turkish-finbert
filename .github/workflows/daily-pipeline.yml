@@ -91,19 +91,20 @@ jobs:
           import urllib.request
           from pathlib import Path
 
-          brief_files = sorted(
-              Path("reports/daily_alerts").glob("*_brief.md"),
+          telegram_files = sorted(
+              Path("reports/daily_alerts").glob("*_telegram.html"),
               key=lambda path: path.stat().st_mtime,
           )
-          if not brief_files:
-              raise SystemExit("No brief report found under reports/daily_alerts.")
+          if not telegram_files:
+              raise SystemExit("No Telegram report found under reports/daily_alerts.")
 
-          brief_path = brief_files[-1]
-          text = brief_path.read_text(encoding="utf-8")[:3900]
+          telegram_path = telegram_files[-1]
+          text = telegram_path.read_text(encoding="utf-8")[:3900]
           payload = urllib.parse.urlencode(
               {
                   "chat_id": os.environ["TELEGRAM_CHAT_ID"],
                   "text": text,
+                  "parse_mode": "HTML",
               }
           ).encode("utf-8")
           request = urllib.request.Request(
@@ -114,7 +115,7 @@ jobs:
           with urllib.request.urlopen(request, timeout=20) as response:
               if response.status >= 400:
                   raise RuntimeError(f"Telegram send failed with HTTP {response.status}")
-          print(f"Telegram brief sent: {brief_path}")
+          print(f"Telegram brief sent: {telegram_path}")
           PY
 
       - name: Upload daily outputs

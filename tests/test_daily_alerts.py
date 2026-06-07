@@ -87,10 +87,12 @@ def test_generate_daily_alerts_writes_rankings_and_market_news(tmp_path):
     assert result["event_signals"]["priority_score"].between(0, 100).all()
     assert (out_dir / "2026-06-01_daily_alerts.md").exists()
     assert (out_dir / "2026-06-01_brief.md").exists()
+    assert (out_dir / "2026-06-01_telegram.html").exists()
     assert (out_dir / "2026-06-01_event_signals.csv").exists()
     assert (out_dir / "2026-06-01_signal_baseline.csv").exists()
     report_text = (out_dir / "2026-06-01_daily_alerts.md").read_text(encoding="utf-8")
     brief_text = (out_dir / "2026-06-01_brief.md").read_text(encoding="utf-8")
+    telegram_text = (out_dir / "2026-06-01_telegram.html").read_text(encoding="utf-8")
     assert "Onemli Olay Ozeti" in report_text
     assert "Gecmis Karsilastirma" in report_text
     assert "En Iyi Hisseler" in report_text
@@ -111,6 +113,10 @@ def test_generate_daily_alerts_writes_rankings_and_market_news(tmp_path):
     assert all(len(line) <= 180 for line in brief_text.splitlines())
     assert "(weak," not in brief_text
     assert "(strong," not in brief_text
+    assert telegram_text.startswith("<b>BIST Gunluk Ozet</b>")
+    assert "<b>Karar</b>" in telegram_text
+    assert "<b>Izlenecekler</b>" in telegram_text
+    assert "AAA" in telegram_text
 
 
 def test_generate_daily_alerts_filters_weak_signals_and_reports_no_signal(tmp_path):
@@ -500,7 +506,7 @@ def test_generate_daily_alerts_groups_same_url_as_one_event(tmp_path):
     assert events.iloc[0]["signal_strength"] in {"medium", "strong"}
 
 
-def test_daily_alerts_sends_brief_text_to_telegram(tmp_path, monkeypatch):
+def test_daily_alerts_sends_html_text_to_telegram(tmp_path, monkeypatch):
     scored = tmp_path / "scored.csv"
     daily = tmp_path / "daily.csv"
     out_dir = tmp_path / "alerts"
@@ -536,8 +542,8 @@ def test_daily_alerts_sends_brief_text_to_telegram(tmp_path, monkeypatch):
         ]
     ).to_csv(daily, index=False)
 
-    def fake_send(token, chat_id, text):
-        sent_messages.append((token, chat_id, text))
+    def fake_send(token, chat_id, text, parse_mode=None):
+        sent_messages.append((token, chat_id, text, parse_mode))
 
     monkeypatch.setenv("TELEGRAM_BOT_TOKEN", "token")
     monkeypatch.setenv("TELEGRAM_CHAT_ID", "chat")
@@ -563,7 +569,8 @@ def test_daily_alerts_sends_brief_text_to_telegram(tmp_path, monkeypatch):
     assert len(sent_messages) == 1
     assert sent_messages[0][0] == "token"
     assert sent_messages[0][1] == "chat"
-    assert sent_messages[0][2].startswith("# BIST Kisa Ozet - 2026-06-01")
-    assert "Karar:" in sent_messages[0][2]
+    assert sent_messages[0][2].startswith("<b>BIST Gunluk Ozet</b>")
+    assert "<b>Karar</b>" in sent_messages[0][2]
     assert "## En Iyi Hisseler" not in sent_messages[0][2]
     assert "(weak," not in sent_messages[0][2]
+    assert sent_messages[0][3] == "HTML"

@@ -231,11 +231,11 @@ $env:TELEGRAM_CHAT_ID="CHAT_ID"
 uv run daily_alerts --scored-news data/processed/kap_api_historical_scored_news.csv --daily-sentiment data/processed/kap_api_historical_daily_sentiment.csv --send-telegram
 ```
 
-Uretilen dosyalar: gunluk Markdown raporu, Telegram'a hazir kisa ozet Markdown dosyasi, olay sinyali CSV'si, gecmis karsilastirma/anomali CSV'si, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
+Uretilen dosyalar: gunluk Markdown raporu, Telegram'a hazir kisa ozet Markdown dosyasi, Telegram HTML mesaji, olay sinyali CSV'si, gecmis karsilastirma/anomali CSV'si, en iyi/en kotu hisse CSV'leri, en guclu pozitif/negatif haber CSV'leri ve piyasa geneli aday haber CSV'si.
 
 Gunluk raporda `Onemli Olay Ozeti` bolumu model skorunu tek basina listelemek yerine haberleri olay seviyesinde gruplar. Bu bolum `materiality_score`, `signal_strength`, olay tipi ve etkilenen ticker listesini kullanarak "bugun anlamli olay var mi, yok mu?" sorusuna daha urun odakli cevap verir.
 
-`Aksiyon Ozeti` bolumu her olayi `takip et`, `detay kontrol et`, `zayif sinyal`, `gecmis veri yetersiz`, `piyasa geneli dikkat` veya `rutin / ignore` gibi karar etiketleriyle aciklar. Bu bolum ayrica `Dagilim: 1 detay kontrol et, 1 gecmis veri yetersiz` gibi gunluk aksiyon sayacini verir. Telegram'a giden kisa ozet ayni `Aksiyon`, `Neden` ve `Aksiyonlar` dilini kullanir, ancak izlenecek satirlarini telefon ekraninda okunacak sekilde kisa tutar: `BJKAS: Oncelik: 36/100 | Aksiyon: detay kontrol et | pozitif zayif +0.22 | yonetim/organizasyon | Neden: yonetim haberi; gecmise gore dikkat cekici.`
+`Aksiyon Ozeti` bolumu her olayi `takip et`, `detay kontrol et`, `zayif sinyal`, `gecmis veri yetersiz`, `piyasa geneli dikkat` veya `rutin / ignore` gibi karar etiketleriyle aciklar. Bu bolum ayrica `Dagilim: 1 detay kontrol et, 1 gecmis veri yetersiz` gibi gunluk aksiyon sayacini verir. Telegram'a giden kisa ozet ayni karar dilini kullanir, ancak HTML `parse_mode` ile kalin basliklar ve kompakt skor bloklari kullanarak telefon ekraninda daha okunur gonderilir.
 
 Olay sinyali CSV'sinde `priority_score` ve `priority_reason` kolonlari da uretilir. `priority_score` 0-100 arasinda hesaplanir; olay onemi, sentiment siddeti, sinyal gucu, gecmis anomali seviyesi ve aksiyon etiketini birlikte kullanir. Kisa ozet ve detay rapor olaylari bu puana gore siralar.
 

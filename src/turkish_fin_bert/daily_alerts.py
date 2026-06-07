@@ -1,4 +1,5 @@
 import argparse
+import html
 import os
 import urllib.parse
 import urllib.request
@@ -585,6 +586,30 @@ def _format_ticker_list(rows: pd.DataFrame, max_rows: int = 5) -> str:
     return ", ".join(f"{row['ticker']} {row['sentiment_score']:+.2f}" for _, row in rows.head(max_rows).iterrows())
 
 
+def _html(text: object) -> str:
+    return html.escape(str(text), quote=False)
+
+
+def _format_telegram_watchlist(
+    event_signals: pd.DataFrame,
+    signal_baseline: pd.DataFrame | None = None,
+    max_rows: int = 3,
+) -> list[str]:
+    if event_signals.empty:
+        return ["Yok"]
+    lines: list[str] = []
+    for _, row in event_signals.head(max_rows).iterrows():
+        score = float(row["avg_impact_score"])
+        lines.append(
+            f"<b>{_html(row['tickers'])}</b> "
+            f"<code>{score:+.2f}</code> | "
+            f"{_html(_event_action(row, signal_baseline))} | "
+            f"oncelik <code>{int(row.get('priority_score', 0))}/100</code>\n"
+            f"{_html(_brief_event_reason(row, signal_baseline))}"
+        )
+    return lines
+
+
 def build_brief_report(
     report_date: pd.Timestamp,
     event_signals: pd.DataFrame,
@@ -629,6 +654,57 @@ def build_brief_report(
         f"Negatif hisseler: {_format_ticker_list(bottom_stocks)}",
     ]
     return "\n".join(lines) + "\n"
+
+
+def build_telegram_report(
+    report_date: pd.Timestamp,
+    event_signals: pd.DataFrame,
+    top_stocks: pd.DataFrame,
+    bottom_stocks: pd.DataFrame,
+    positive_news: pd.DataFrame,
+    negative_news: pd.DataFrame,
+    market_news: pd.DataFrame,
+    daily_rows: pd.DataFrame,
+    signal_baseline: pd.DataFrame | None = None,
+    min_abs_score: float = 0.20,
+) -> str:
+    avg_score = float(daily_rows["sentiment_score"].mean()) if not daily_rows.empty else 0.0
+    total_news = int(daily_rows["news_count"].sum()) if not daily_rows.empty else 0
+    direction = "pozitif" if avg_score > 0.05 else "negatif" if avg_score < -0.05 else "notr"
+    signal_count = _signal_count(event_signals, top_stocks, bottom_stocks, positive_news, negative_news, market_news)
+    flow_summary = _flow_summary(daily_rows, event_signals, top_stocks, bottom_stocks, market_news)
+    medium_strong_count = (
+        int(event_signals["signal_strength"].isin(["medium", "strong"]).sum()) if not event_signals.empty else 0
+    )
+    weak_count = int(event_signals["signal_strength"].eq("weak").sum()) if not event_signals.empty else 0
+    market_line = "Var" if not market_news.empty else "Yok"
+    watchlist = "\n\n".join(_format_telegram_watchlist(event_signals, signal_baseline))
+
+    lines = [
+        f"<b>BIST Gunluk Ozet</b> <code>{report_date.strftime('%Y-%m-%d')}</code>",
+        "",
+        f"<b>Karar</b>\n{_html(_brief_decision(event_signals, signal_count))}",
+        "",
+        f"<b>Sonuc</b>\n{_html(_daily_result(event_signals, signal_count))}",
+        "",
+        "<b>Durum</b>",
+        f"<code>Genel    {avg_score:+.3f} ({direction})</code>",
+        f"<code>Haber    {total_news}</code>",
+        f"<code>Oncelik  {_priority_level(event_signals)}</code>",
+        f"<code>Olay     {medium_strong_count} orta/guclu, {weak_count} zayif</code>",
+        "",
+        f"<b>Akis</b>\n{_html(flow_summary)}",
+        f"<b>Gecmis</b>\n{_html(_baseline_summary(signal_baseline, min_abs_score))}",
+        f"<b>Aksiyonlar</b>\n{_html(_action_summary(event_signals, signal_baseline))}",
+        f"<b>Piyasa geneli</b>\n{_html(market_line)}",
+        "",
+        f"<b>Izlenecekler</b>\n{watchlist}",
+        "",
+        f"<b>Pozitif</b>: {_html(_format_ticker_list(top_stocks))}",
+        f"<b>Negatif</b>: {_html(_format_ticker_list(bottom_stocks))}",
+        f"<b>Esik</b>: <code>|skor| &gt;= {min_abs_score:.2f}</code>",
+    ]
+    return "\n".join(lines)[:3900] + "\n"
 
 
 def build_markdown_report(
@@ -751,6 +827,7 @@ def generate_daily_alerts(
         "market_news": out_dir / f"{date_slug}_market_news.csv",
         "signal_baseline": out_dir / f"{date_slug}_signal_baseline.csv",
         "brief": out_dir / f"{date_slug}_brief.md",
+        "telegram": out_dir / f"{date_slug}_telegram.html",
         "markdown": out_dir / f"{date_slug}_daily_alerts.md",
     }
     event_signals.to_csv(paths["event_signals"], index=False)
@@ -785,13 +862,28 @@ def generate_daily_alerts(
         signal_baseline=signal_baseline,
         min_abs_score=min_abs_score,
     )
+    telegram = build_telegram_report(
+        report_date,
+        event_signals,
+        top_stocks,
+        bottom_stocks,
+        positive_news,
+        negative_news,
+        market_news,
+        daily_day,
+        signal_baseline=signal_baseline,
+        min_abs_score=min_abs_score,
+    )
     paths["brief"].write_text(brief, encoding="utf-8")
+    paths["telegram"].write_text(telegram, encoding="utf-8")
     paths["markdown"].write_text(markdown, encoding="utf-8")
 
     return {
         "date": date_slug,
         "brief_text": brief,
         "brief_path": paths["brief"],
+        "telegram_text": telegram,
+        "telegram_path": paths["telegram"],
         "markdown_text": markdown,
         "markdown_path": paths["markdown"],
         "event_signals": event_signals,
@@ -804,9 +896,12 @@ def generate_daily_alerts(
     }
 
 
-def send_telegram_message(token: str, chat_id: str, text: str) -> None:
+def send_telegram_message(token: str, chat_id: str, text: str, parse_mode: str | None = None) -> None:
     url = f"https://api.telegram.org/bot{token}/sendMessage"
-    payload = urllib.parse.urlencode({"chat_id": chat_id, "text": text[:3900]}).encode("utf-8")
+    payload_data = {"chat_id": chat_id, "text": text[:3900]}
+    if parse_mode:
+        payload_data["parse_mode"] = parse_mode
+    payload = urllib.parse.urlencode(payload_data).encode("utf-8")
     request = urllib.request.Request(url, data=payload, method="POST")
     with urllib.request.urlopen(request, timeout=20) as response:
         if response.status >= 400:
@@ -851,7 +946,7 @@ def main() -> None:
         chat_id = os.getenv(args.telegram_chat_id_env, "")
         if not token or not chat_id:
             raise RuntimeError(f"Telegram icin {args.telegram_token_env} ve {args.telegram_chat_id_env} env var gerekli.")
-        send_telegram_message(token, chat_id, str(result["brief_text"]))
+        send_telegram_message(token, chat_id, str(result["telegram_text"]), parse_mode="HTML")
         print("Telegram mesaji gonderildi.")
 
 
