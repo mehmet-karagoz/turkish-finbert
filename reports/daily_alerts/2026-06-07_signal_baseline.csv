@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-07,FRIGO,-0.123932300589538,1,1,0.0120682808852427,0.0,0.0120682808852427,-0.1360005814747807,,insufficient_history
