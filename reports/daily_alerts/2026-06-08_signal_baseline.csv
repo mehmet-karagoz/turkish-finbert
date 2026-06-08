@@ -1,0 +1,5 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-08,RAYSG,-0.242345864650095,1,0,,,,,,insufficient_history
+2026-06-08,RUBNS,-0.172835474772145,1,0,,,,,,insufficient_history
+2026-06-08,BRSAN,-0.0677005325230356,1,1,0.6288248155160161,0.0,0.6288248155160161,-0.6965253480390516,,insufficient_history
+2026-06-08,KGYO,-0.0022124901580305,1,0,,,,,,insufficient_history
