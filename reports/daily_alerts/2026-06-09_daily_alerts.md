@@ -1,37 +1,37 @@
 # BIST Gunluk Sentiment Raporu - 2026-06-09
 
-Genel skor: -0.173 (negatif), haber adedi: 1
+Genel skor: -0.120 (negatif), haber adedi: 5
 Sinyal esigi: |skor| >= 0.20
-Bugun esigi asan anlamli haber/hisse sinyali yok.
+Bugun esigi asan ancak zayif sinyaller var.
 
 ## Gunluk Karar
-Karar: Bugun aksiyon gerektiren olay yok.
-Sonuc: Onemli olay yok; takip listesi bos.
-Akis: 1 haber, 1 hisse, 0 esik ustu hisse, 0 olay, 0 piyasa geneli aday
-Oncelik seviyesi: yok
+Karar: Bugun oncelikli olay yok; sinyaller zayif.
+Sonuc: Oncelikli olay yok; sinyaller zayif.
+Akis: 5 haber, 5 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
+Oncelik seviyesi: cok dusuk (28/100)
 
 ## Onemli Olay Ozeti
-- Veri yok
+- HRKET: -0.259, oncelik 28/100, onem 0.31, weak | other | HAREKET PROJE TAŞIMACILIĞI VE YÜK MÜHENDİSLİĞİ A.Ş. - Özel Durum Açıklaması (Genel)
 
 ## Aksiyon Ozeti
-Dagilim: aksiyon gerektiren olay yok
-- Veri yok
+Dagilim: 1 gecmis veri yetersiz
+- HRKET: gecmis veri yetersiz | oncelik 28/100 | negatif -0.259 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu zayif, onem skoru 0.31; gecmis veri az.
 
 ## Gecmis Karsilastirma
-Ozet: Skor esigini asan hisse yok.
+Ozet: Esigi asan hisselerde yeterli gecmis veri yok.
 - Veri yok
 
 ## En Iyi Hisseler
 - Veri yok
 
 ## En Kotu Hisseler
-- Veri yok
+- HRKET: -0.259 (1 haber)
 
 ## En Guclu Pozitif Haberler
 - Veri yok
 
 ## En Guclu Negatif Haberler
-- Veri yok
+- HRKET: -0.259 | HAREKET PROJE TAŞIMACILIĞI VE YÜK MÜHENDİSLİĞİ A.Ş. - Özel Durum Açıklaması (Genel)
 
 ## Piyasa Geneli Aday Haberler
 - Veri yok
