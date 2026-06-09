@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-09,RUBNS,-0.172835474772145,1,1,-0.172835474772145,0.0,0.172835474772145,0.0,,insufficient_history
