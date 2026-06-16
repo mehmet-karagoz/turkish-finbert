@@ -1,0 +1,3 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-16,YIGIT,0.7931498486887658,1,1,-0.003710441873059,0.0,0.003710441873059,0.7968602905618248,,insufficient_history
+2026-06-16,ATSYH,0.0042362563150276,1,1,-0.1460515980158505,0.0,0.1460515980158505,0.1502878543308781,,insufficient_history

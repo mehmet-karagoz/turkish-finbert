@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+56c608cf9311,YIGIT,YIGIT,YİĞİT AKÜ MALZEMELERİ NAKLİYAT TURİZM İNŞAAT SANAYİ VE TİCARET A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim,other,stock_specific,1,0.7931,0.8784,0.7019,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1617517,67,aksiyon=detay kontrol et; guc=orta; onem=0.70; gecmis=gecmis veri az
