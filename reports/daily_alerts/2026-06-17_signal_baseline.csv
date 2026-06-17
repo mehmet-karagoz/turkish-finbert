@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-17,TRYKI,0.0176417936430238,1,4,0.020208525694740024,0.0028323726510067087,0.02313366421731157,-0.0025667320517162237,,insufficient_history
