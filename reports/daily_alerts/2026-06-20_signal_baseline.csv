@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-20,KLRHO,0.0435347711883584,3,2,0.0291870536257586,0.013624469106873798,0.04008662891125764,0.0143477175625998,,insufficient_history
