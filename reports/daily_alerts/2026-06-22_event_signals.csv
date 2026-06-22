@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+c23e3a60d9e2,LOGO,LOGO,LOGO YAZILIM SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim,other,stock_specific,1,0.7558,0.8138,0.6684,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1619162,62,aksiyon=detay kontrol et; guc=orta; onem=0.67; gecmis=gecmise gore olagan
