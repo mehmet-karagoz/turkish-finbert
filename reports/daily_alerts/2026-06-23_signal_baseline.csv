@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-23,EGEEN,0.0070929327102881,1,3,-0.10447884273037954,0.013670188095612436,0.11739596301318873,0.11157177544066764,,insufficient_history
