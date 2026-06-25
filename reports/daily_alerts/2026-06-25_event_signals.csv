@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+d7b3e829d9b7,EBEBK,EBEBK,EBEBEK MAĞAZACILIK A.Ş. - Özel Durum Açıklaması (Genel),management,stock_specific,1,-0.2694,0.3836,0.3349,negative,weak,negative; weak; management; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1620465,26,aksiyon=zayif sinyal; guc=zayif; onem=0.33; gecmis=gecmise gore olagan
