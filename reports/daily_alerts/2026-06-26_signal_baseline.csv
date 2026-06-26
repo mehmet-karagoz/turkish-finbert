@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-26,GGBVK,0.0155201494076422,2,2,-0.0766440082234528,0.0942121820081875,0.15552738858694976,0.09216415763109499,0.9782615758022193,insufficient_history
