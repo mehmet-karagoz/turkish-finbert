@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-06-27,KLGYO,0.7218311813224891,1,5,0.04655476734108946,0.0855619686775291,0.1451357451716614,0.6752764139813997,7.892249610646764,unusual
