@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+2eec8eb9cee8,SEYKM,SEYKM,SEYİTLER KİMYA SANAYİ A.Ş. - Ortaklık Aleyhine Dava Açılması veya Davaya İlişkin Gelişmeler,legal_regulatory,stock_specific,1,-0.9101,0.9374,0.878,negative,strong,negative; strong; legal_regulatory; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1621275,84,aksiyon=takip et; guc=guclu; onem=0.88; gecmis=gecmis veri az
