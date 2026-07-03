@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+ab72ddc57a7f,MERKO,MERKO,MERKO GIDA SANAYİ VE TİCARET A.Ş. - Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim,capital_action,stock_specific,1,0.3678,0.4866,0.4796,positive,weak,positive; weak; capital_action; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1623470,38,aksiyon=gecmis veri yetersiz; guc=zayif; onem=0.48; gecmis=gecmis veri az
