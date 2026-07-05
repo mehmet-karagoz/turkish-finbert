@@ -1,13 +1,13 @@
 # BIST Gunluk Sentiment Raporu - 2026-07-04
 
-Genel skor: -0.135 (negatif), haber adedi: 6
+Genel skor: -0.110 (negatif), haber adedi: 7
 Sinyal esigi: |skor| >= 0.20
 Bugun esigi asan ancak zayif sinyaller var.
 
 ## Gunluk Karar
 Karar: Bugun dusuk oncelikli manuel kontrol sinyali var.
 Sonuc: Zayif sinyaller var; manuel kontrol disinda aksiyon gerektirmiyor.
-Akis: 6 haber, 2 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
+Akis: 7 haber, 3 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
 Oncelik seviyesi: dusuk (40/100)
 
 ## Onemli Olay Ozeti
