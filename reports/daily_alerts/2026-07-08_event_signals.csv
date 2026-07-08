@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+f16a19899e7a,TURSG,TURSG,TÜRKİYE SİGORTA A.Ş. - Özel Durum Açıklaması (Genel),other,stock_specific,1,-0.2324,0.3599,0.2898,negative,weak,negative; weak; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1627616,23,aksiyon=zayif sinyal; guc=zayif; onem=0.29; gecmis=gecmise gore olagan
