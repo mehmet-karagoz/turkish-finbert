@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+7ab5e7dec703,PENTA,PENTA,PENTA TEKNOLOJİ ÜRÜNLERİ DAĞITIM TİCARET A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim,other,stock_specific,1,0.768,0.8674,0.6859,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1630380,65,aksiyon=detay kontrol et; guc=orta; onem=0.69; gecmis=gecmis veri az

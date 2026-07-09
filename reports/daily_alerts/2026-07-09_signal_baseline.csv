@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-07-09,PENTA,0.3424117381918367,2,3,-0.014453055988060562,0.17032694001897952,0.21182343960238934,0.35686479417989725,2.0951752796130303,insufficient_history
