@@ -1,13 +1,13 @@
 # BIST Gunluk Sentiment Raporu - 2026-07-11
 
-Genel skor: -0.017 (notr), haber adedi: 1
+Genel skor: -0.051 (negatif), haber adedi: 7
 Sinyal esigi: |skor| >= 0.20
 Bugun esigi asan anlamli haber/hisse sinyali yok.
 
 ## Gunluk Karar
 Karar: Bugun aksiyon gerektiren olay yok.
 Sonuc: Onemli olay yok; takip listesi bos.
-Akis: 1 haber, 1 hisse, 0 esik ustu hisse, 0 olay, 0 piyasa geneli aday
+Akis: 7 haber, 5 hisse, 0 esik ustu hisse, 0 olay, 0 piyasa geneli aday
 Oncelik seviyesi: yok
 
 ## Onemli Olay Ozeti

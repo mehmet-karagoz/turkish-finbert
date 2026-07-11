@@ -1,2 +1,6 @@
 date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-07-11,BNTAS,-0.1367545003850783,1,1,-0.1225863073677848,0.0,0.1225863073677848,-0.01416819301729351,,insufficient_history
+2026-07-11,ULUUN,-0.1036256144474126,1,0,,,,,,insufficient_history
+2026-07-11,PAGYO,0.0892737156831517,3,1,-0.0022124901580305,0.0,0.0022124901580305,0.09148620584118221,,insufficient_history
+2026-07-11,UMPAS,-0.0853390204618153,1,0,,,,,,insufficient_history
 2026-07-11,MCARD,-0.0172335192981082,1,0,,,,,,insufficient_history
