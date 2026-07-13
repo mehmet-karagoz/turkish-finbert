@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-07-12,ANELE,-0.0145694990096834,2,11,-0.0493502426775533,0.12883190892819732,0.157383316198881,0.0347807436678699,0.26996994733078483,normal
