@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-07-15,MEGMT,0.0120139119046125,1,6,0.14745163908259565,0.342018959409331,0.5978231391409096,-0.13543772717798314,-0.3959947934228119,normal
