@@ -1,1 +1,2 @@
 event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+1a61b192bf25,UMPAS,UMPAS,UMPAŞ HOLDİNG A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim,other,stock_specific,1,0.7361,0.8476,0.6644,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1633940,64,aksiyon=detay kontrol et; guc=orta; onem=0.66; gecmis=gecmis veri az
