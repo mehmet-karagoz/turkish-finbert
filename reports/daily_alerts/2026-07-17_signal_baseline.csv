@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-07-17,SANEL,-0.1408212503206638,1,5,-0.08070664031377445,0.08724180013134036,0.1408212503206638,-0.06011461000688936,-0.6890574233496822,normal
