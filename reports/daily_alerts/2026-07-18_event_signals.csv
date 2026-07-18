@@ -1,1 +1,2 @@
 event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+ef6326126921,TSPOR,TSPOR,TRABZONSPOR SPORTİF YATIRIM VE FUTBOL İŞLETMECİLİĞİ TİCARET A.Ş. - Sözleşme İmzalanması,contract_order,stock_specific,1,0.2689,0.4117,0.3903,positive,weak,positive; weak; contract_order; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1634747,28,aksiyon=zayif sinyal; guc=zayif; onem=0.39; gecmis=gecmise gore olagan

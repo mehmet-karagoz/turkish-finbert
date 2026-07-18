@@ -1,21 +1,21 @@
 # BIST Gunluk Sentiment Raporu - 2026-07-18
 
-Genel skor: +0.009 (notr), haber adedi: 46
+Genel skor: +0.011 (notr), haber adedi: 50
 Sinyal esigi: |skor| >= 0.20
-Bugun esigi asan anlamli haber/hisse sinyali yok.
+Bugun esigi asan ancak zayif sinyaller var.
 
 ## Gunluk Karar
-Karar: Bugun aksiyon gerektiren olay yok.
-Sonuc: Onemli olay yok; takip listesi bos.
-Akis: 46 haber, 2 hisse, 0 esik ustu hisse, 0 olay, 0 piyasa geneli aday
-Oncelik seviyesi: yok
+Karar: Bugun oncelikli olay yok; sinyaller zayif.
+Sonuc: Oncelikli olay yok; sinyaller zayif.
+Akis: 50 haber, 5 hisse, 0 esik ustu hisse, 1 olay, 0 piyasa geneli aday
+Oncelik seviyesi: cok dusuk (28/100)
 
 ## Onemli Olay Ozeti
-- Veri yok
+- TSPOR: +0.269, oncelik 28/100, onem 0.39, weak | contract_order | TRABZONSPOR SPORTİF YATIRIM VE FUTBOL İŞLETMECİLİĞİ TİCARET A.Ş. - Sözleşme İmzalanması
 
 ## Aksiyon Ozeti
-Dagilim: aksiyon gerektiren olay yok
-- Veri yok
+Dagilim: 1 zayif sinyal
+- TSPOR: zayif sinyal | oncelik 28/100 | pozitif +0.269 | gelir beklentisini etkileyebilecek is iliskisi; olay gucu zayif, onem skoru 0.39; gecmise gore olagan.
 
 ## Gecmis Karsilastirma
 Ozet: Skor esigini asan hisse yok.
@@ -28,7 +28,7 @@ Ozet: Skor esigini asan hisse yok.
 - Veri yok
 
 ## En Guclu Pozitif Haberler
-- Veri yok
+- TSPOR: +0.269 | TRABZONSPOR SPORTİF YATIRIM VE FUTBOL İŞLETMECİLİĞİ TİCARET A.Ş. - Sözleşme İmzalanması
 
 ## En Guclu Negatif Haberler
 - Veri yok
