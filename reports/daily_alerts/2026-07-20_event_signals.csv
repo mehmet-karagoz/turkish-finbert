@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+8b0e4d45c87b,GRTHO,GRTHO,GRAINTURK HOLDİNG A.Ş. - Özel Durum Açıklaması (Genel),other,stock_specific,1,-0.2034,0.361,0.2741,negative,weak,negative; weak; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1634756,26,aksiyon=gecmis veri yetersiz; guc=zayif; onem=0.27; gecmis=gecmis veri az
