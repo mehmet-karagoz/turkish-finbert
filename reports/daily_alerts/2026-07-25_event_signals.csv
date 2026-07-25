@@ -1,1 +1,2 @@
 event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+443e00854de0,BURCE,BURCE,BURÇELİK BURSA ÇELİK DÖKÜM SANAYİİ A.Ş. - Özel Durum Açıklaması (Genel),other,stock_specific,1,-0.214,0.3421,0.2761,negative,weak,negative; weak; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1636749,26,aksiyon=gecmis veri yetersiz; guc=zayif; onem=0.28; gecmis=gecmis veri az
