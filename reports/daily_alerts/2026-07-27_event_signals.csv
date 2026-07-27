@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+a9d573dc76f8,FRMPL,FRMPL,FORMÜL PLASTİK VE METAL SANAYİ A.Ş. - Yeni İş İlişkisi,contract_order,stock_specific,1,0.7861,0.8429,0.7609,positive,strong,positive; strong; contract_order; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1636751,76,aksiyon=takip et; guc=guclu; onem=0.76; gecmis=gecmis veri az

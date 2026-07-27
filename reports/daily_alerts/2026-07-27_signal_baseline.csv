@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-07-27,FRMPL,0.7861376303706318,1,2,-0.16943241906832146,0.03470868994298394,0.1971993710227086,0.9555700494389532,27.5311471279576,insufficient_history
