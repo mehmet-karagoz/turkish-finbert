@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+e9aeb87c5c94,"GARAN,TGB",GARAN,TÜRKİYE GARANTİ BANKASI A.Ş. - Özel Durum Açıklaması (Genel),other,multi_stock,2,-0.208,0.3361,0.3671,negative,weak,negative; weak; other; multi_stock; 2 haber,https://www.kap.org.tr/tr/Bildirim/1639063,26,aksiyon=zayif sinyal; guc=zayif; onem=0.37; gecmis=gecmise gore olagan
