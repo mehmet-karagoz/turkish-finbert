@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-08-01,CRFSA,0.0039219728898063,5,8,-0.017721067672927887,0.05366744272574734,0.08732668004067679,0.021643040562734188,0.40328063838135486,normal
