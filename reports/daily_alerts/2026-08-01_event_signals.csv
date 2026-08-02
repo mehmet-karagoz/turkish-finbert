@@ -1,1 +1,2 @@
 event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+b47601a2dfdf,CRFSA,CRFSA,CARREFOURSA CARREFOUR SABANCI TİCARET MERKEZİ A.Ş. - Özel Durum Açıklaması (Genel),other,stock_specific,1,-0.2314,0.3424,0.2858,negative,weak,negative; weak; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1641849,23,aksiyon=zayif sinyal; guc=zayif; onem=0.29; gecmis=gecmise gore olagan
