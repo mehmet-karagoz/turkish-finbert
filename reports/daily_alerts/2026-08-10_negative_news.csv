@@ -1,0 +1,2 @@
+date,ticker,source,title,text,url,language,published_at,prob_negative,prob_neutral,prob_positive,prediction,sentiment_score,confidence,impact_score
+2026-08-10,TURSG,KAP,TÜRKİYE SİGORTA A.Ş. - Özel Durum Açıklaması (Genel),TÜRKİYE SİGORTA A.Ş. - Özel Durum Açıklaması (Genel). Özel Durum Açıklaması (Genel) 2026 Temmuz Sonu Brüt Prim Üretimi,https://www.kap.org.tr/tr/Bildirim/1645962,tr,2026-08-10T07:30:18+00:00,0.3599053170753215,0.5125564229985022,0.1275382599261761,neutral,-0.2323670571491453,0.3599053170753215,-0.23236705714914538
