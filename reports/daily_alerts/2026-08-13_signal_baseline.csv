@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-08-13,KMPUR,-0.1221396507351341,1,5,-0.02141978999809158,0.06505996608962736,0.09780592392017058,-0.10071986073704252,-1.5481081038113311,normal
