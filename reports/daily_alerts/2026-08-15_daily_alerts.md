@@ -1,13 +1,13 @@
 # BIST Gunluk Sentiment Raporu - 2026-08-15
 
-Genel skor: +0.155 (pozitif), haber adedi: 4
+Genel skor: +0.098 (pozitif), haber adedi: 18
 Sinyal esigi: |skor| >= 0.20
 Bugun esigi asan ancak zayif sinyaller var.
 
 ## Gunluk Karar
 Karar: Bugun orta oncelikli takip gerektiren olay var.
 Sonuc: Orta oncelikli olay var; haber detayi kontrol edilmeli.
-Akis: 4 haber, 3 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
+Akis: 18 haber, 7 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
 Oncelik seviyesi: orta (51/100)
 
 ## Onemli Olay Ozeti
