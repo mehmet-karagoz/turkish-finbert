@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-08-22,TEZOL,0.824827816231498,1,11,0.5852223555216973,0.3174655909241535,0.824827816231503,0.2396054607098007,0.7547446638619978,normal
