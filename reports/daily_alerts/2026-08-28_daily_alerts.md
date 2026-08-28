@@ -1,41 +1,86 @@
 # BIST Gunluk Sentiment Raporu - 2026-08-28
 
-Genel skor: +0.812 (pozitif), haber adedi: 2
+Genel skor: +0.064 (pozitif), haber adedi: 110
 Sinyal esigi: |skor| >= 0.20
 Bugun orta/guclu olay sinyali var.
 
 ## Gunluk Karar
-Karar: Bugun orta oncelikli takip gerektiren olay var.
-Sonuc: Orta oncelikli olay var; haber detayi kontrol edilmeli.
-Akis: 2 haber, 2 hisse, 2 esik ustu hisse, 2 olay, 0 piyasa geneli aday
-Oncelik seviyesi: orta (66/100)
+Karar: Bugun yuksek oncelikli takip gerektiren olay var.
+Sonuc: Yuksek oncelikli olay var; detay kontrol edilmeli.
+Akis: 110 haber, 80 hisse, 15 esik ustu hisse, 10 olay, 0 piyasa geneli aday
+Oncelik seviyesi: yuksek (77/100)
 
 ## Onemli Olay Ozeti
+- BRLSM: +0.814, oncelik 77/100, onem 0.78, strong | contract_order | BİRLEŞİM MÜHENDİSLİK ISITMA SOĞUTMA HAVALANDIRMA SANAYİ VE TİCARET A.Ş. - Yeni İş İlişkisi
+- AVHOL: +0.780, oncelik 71/100, onem 0.69, medium | other | AVRUPA YATIRIM HOLDİNG A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- ESCOM: +0.811, oncelik 68/100, onem 0.71, medium | other | ESCORT TEKNOLOJİ YATIRIM A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim
 - TEZOL: +0.825, oncelik 66/100, onem 0.72, medium | other | EUROPAP TEZOL KAĞIT SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- YEOTK: +0.765, oncelik 65/100, onem 0.75, medium | contract_order | YEO TEKNOLOJİ ENERJİ VE ENDÜSTRİ A.Ş. - Yeni İş İlişkisi
+- MAGEN: +0.767, oncelik 65/100, onem 0.74, medium | contract_order | MARGÜN ENERJİ ÜRETİM SANAYİ VE TİCARET A.Ş. - Yeni İş İlişkisi
+- IZENR: +0.814, oncelik 65/100, onem 0.71, medium | other | İZDEMİR ENERJİ ELEKTRİK ÜRETİM A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- MAGEN: +0.803, oncelik 64/100, onem 0.70, medium | other | MARGÜN ENERJİ ÜRETİM SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
 - BALAT: +0.799, oncelik 64/100, onem 0.70, medium | other | BALATACILAR BALATACILIK SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- HALKB,THL: +0.439, oncelik 64/100, onem 0.64, medium | legal_regulatory | TÜRKİYE HALK BANKASI A.Ş. - Sermaye Artırımı - Azaltımı İşlemlerine İlişkin Bildirim
 
 ## Aksiyon Ozeti
-Dagilim: 2 detay kontrol et
+Dagilim: 1 takip et, 9 detay kontrol et
+- BRLSM: takip et | oncelik 77/100 | pozitif +0.814 | gelir beklentisini etkileyebilecek is iliskisi; olay gucu yuksek, onem skoru 0.78; gecmis veri az.
+- AVHOL: detay kontrol et | oncelik 71/100 | pozitif +0.780 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.69; gecmise gore dikkat cekici.
+- ESCOM: detay kontrol et | oncelik 68/100 | pozitif +0.811 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.71; gecmis veri az.
 - TEZOL: detay kontrol et | oncelik 66/100 | pozitif +0.825 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.72; gecmise gore olagan.
+- YEOTK: detay kontrol et | oncelik 65/100 | pozitif +0.765 | gelir beklentisini etkileyebilecek is iliskisi; olay gucu orta, onem skoru 0.75; gecmise gore olagan.
+- MAGEN: detay kontrol et | oncelik 65/100 | pozitif +0.767 | gelir beklentisini etkileyebilecek is iliskisi; olay gucu orta, onem skoru 0.74; gecmise gore olagan.
+- IZENR: detay kontrol et | oncelik 65/100 | pozitif +0.814 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.71; gecmise gore olagan.
+- MAGEN: detay kontrol et | oncelik 64/100 | pozitif +0.803 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.70; gecmise gore olagan.
 - BALAT: detay kontrol et | oncelik 64/100 | pozitif +0.799 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.70; gecmise gore olagan.
+- HALKB,THL: detay kontrol et | oncelik 64/100 | pozitif +0.439 | hukuki veya duzenleyici belirsizlik yaratabilir; olay gucu orta, onem skoru 0.64; gecmise gore sira disi.
 
 ## Gecmis Karsilastirma
-Ozet: Bugunku esik ustu sinyaller gecmise gore olagan.
-- Veri yok
+Ozet: 2 sira disi, 3 dikkat cekici hisse sinyali var.
+- HALKB: +0.439, gecmise gore sira disi, z=+5.85, gecmis gun=22
+- THL: +0.439, gecmise gore sira disi, z=+5.85, gecmis gun=22
+- AVHOL: +0.780, gecmise gore dikkat cekici, z=+1.55, gecmis gun=7
+- ENDAE: -0.313, gecmise gore dikkat cekici, z=-1.64, gecmis gun=13
+- SAHOL: -0.229, gecmise gore dikkat cekici, z=-1.89, gecmis gun=10
 
 ## En Iyi Hisseler
 - TEZOL: +0.825 (1 haber)
+- BRLSM: +0.814 (1 haber)
+- IZENR: +0.814 (1 haber)
 - BALAT: +0.799 (1 haber)
+- MAGEN: +0.785 (2 haber)
+- AVHOL: +0.780 (1 haber)
+- YEOTK: +0.765 (1 haber)
+- AKSUE: +0.479 (1 haber)
+- HALKB: +0.439 (1 haber)
+- THL: +0.439 (1 haber)
 
 ## En Kotu Hisseler
-- Veri yok
+- ENDAE: -0.313 (1 haber)
+- PRKAB: -0.235 (1 haber)
+- SAHOL: -0.229 (1 haber)
+- NUHCM: -0.220 (1 haber)
+- CELHA: -0.202 (1 haber)
 
 ## En Guclu Pozitif Haberler
 - TEZOL: +0.825 | EUROPAP TEZOL KAĞIT SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- BRLSM: +0.814 | BİRLEŞİM MÜHENDİSLİK ISITMA SOĞUTMA HAVALANDIRMA SANAYİ VE TİCARET A.Ş. - Yeni İş İlişkisi
+- IZENR: +0.814 | İZDEMİR ENERJİ ELEKTRİK ÜRETİM A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- ESCOM: +0.811 | ESCORT TEKNOLOJİ YATIRIM A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim
+- MAGEN: +0.803 | MARGÜN ENERJİ ÜRETİM SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
 - BALAT: +0.799 | BALATACILAR BALATACILIK SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- AVHOL: +0.780 | AVRUPA YATIRIM HOLDİNG A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
+- MAGEN: +0.767 | MARGÜN ENERJİ ÜRETİM SANAYİ VE TİCARET A.Ş. - Yeni İş İlişkisi
+- YEOTK: +0.765 | YEO TEKNOLOJİ ENERJİ VE ENDÜSTRİ A.Ş. - Yeni İş İlişkisi
+- MIATK: +0.588 | MİA TEKNOLOJİ A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim
 
 ## En Guclu Negatif Haberler
-- Veri yok
+- ENDAE: -0.313 | ENDA ENERJİ HOLDİNG A.Ş. - Özel Durum Açıklaması (Genel)
+- PRKAB: -0.235 | TÜRK PRYSMİAN KABLO VE SİSTEMLERİ A.Ş. - Özel Durum Açıklaması (Genel)
+- SAHOL: -0.229 | HACI ÖMER SABANCI HOLDİNG A.Ş. - Özel Durum Açıklaması (Genel)
+- NUHCM: -0.220 | NUH ÇİMENTO SANAYİ A.Ş. - Özel Durum Açıklaması (Genel)
+- MNDTR: -0.217 | MONDİ TURKEY OLUKLU MUKAVVA KAĞIT VE AMBALAJ SANAYİ A.Ş. - Özel Durum Açıklaması (Genel)
+- CELHA: -0.202 | ÇELİK HALAT VE TEL SANAYİİ A.Ş. - Özel Durum Açıklaması (Genel)
 
 ## Piyasa Geneli Aday Haberler
 - Veri yok
