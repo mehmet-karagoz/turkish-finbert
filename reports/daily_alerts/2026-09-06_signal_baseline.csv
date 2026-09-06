@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-09-06,GENIL,0.0397940335358624,2,8,0.08323578796903215,0.2586382758485259,0.30136358480736736,-0.04344175443316975,-0.16796336230841505,normal
