@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+86cb08737fe0,RAYSG,RAYSG,RAY SİGORTA A.Ş. - Özel Durum Açıklaması (Genel),other,stock_specific,1,-0.2423,0.3768,0.2986,negative,weak,negative; weak; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1659265,24,aksiyon=zayif sinyal; guc=zayif; onem=0.30; gecmis=gecmise gore olagan
