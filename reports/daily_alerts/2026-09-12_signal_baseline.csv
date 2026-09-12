@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-09-12,BALAT,0.7915665362587792,1,27,0.6653337462093889,0.2876813466527095,0.807539122984598,0.12623279004939025,0.43879379569847177,normal
