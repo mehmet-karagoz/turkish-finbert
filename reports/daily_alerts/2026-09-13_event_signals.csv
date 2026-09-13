@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+ab039dfbc893,KTLEV,KTLEV,KATILIMEVİM TASARRUF FİNANSMAN A.Ş. - Özel Durum Açıklaması (Genel),debt_credit,stock_specific,1,-0.311,0.4175,0.4546,negative,weak,negative; weak; debt_credit; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1662136,32,aksiyon=zayif sinyal; guc=zayif; onem=0.45; gecmis=gecmise gore olagan
