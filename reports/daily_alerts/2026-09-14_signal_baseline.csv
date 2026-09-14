@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-09-14,TTKOM,0.2985054410880838,2,13,-0.042805871789799284,0.10042429279362854,0.2183938306055553,0.3413113128778831,3.3986927204882216,unusual
