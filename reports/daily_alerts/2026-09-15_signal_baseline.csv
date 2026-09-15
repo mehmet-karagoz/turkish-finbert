@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-09-15,CWENE,-0.1352360463678017,1,27,0.01835741732555285,0.24344474162137367,0.3782391261954819,-0.15359346369335455,-0.6309171546298437,normal
