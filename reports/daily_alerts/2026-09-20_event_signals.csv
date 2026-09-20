@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+ab8952cd4863,LYDYE,LYDYE,LYDİA YEŞİL ENERJİ KAYNAKLARI A.Ş. - Hak Kullanım Süreç İptal Bildirimi,other,stock_specific,1,-0.7937,0.8542,0.6974,negative,medium,negative; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1665625,75,aksiyon=detay kontrol et; guc=orta; onem=0.70; gecmis=gecmise gore sira disi
