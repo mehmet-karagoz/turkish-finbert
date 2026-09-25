@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+8c5a04a44b50,BLUME,BLUME,BLUME METAL KİMYA A.Ş. - Payların Geri Alınmasına İlişkin Bildirim,other,stock_specific,1,0.7967,0.8532,0.6988,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1667969,76,aksiyon=detay kontrol et; guc=orta; onem=0.70; gecmis=gecmise gore sira disi
