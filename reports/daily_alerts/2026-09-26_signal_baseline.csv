@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-09-26,TKFEN,-0.1667467649067457,1,11,-0.0559488041280562,0.15902506067233152,0.2448076469100595,-0.1107979607786895,-0.6967327055890068,normal
