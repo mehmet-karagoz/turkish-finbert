@@ -1,34 +1,34 @@
 # BIST Gunluk Sentiment Raporu - 2026-09-26
 
-Genel skor: -0.167 (negatif), haber adedi: 1
+Genel skor: +0.304 (pozitif), haber adedi: 2
 Sinyal esigi: |skor| >= 0.20
-Bugun esigi asan anlamli haber/hisse sinyali yok.
+Bugun orta/guclu olay sinyali var.
 
 ## Gunluk Karar
-Karar: Bugun aksiyon gerektiren olay yok.
-Sonuc: Onemli olay yok; takip listesi bos.
-Akis: 1 haber, 1 hisse, 0 esik ustu hisse, 0 olay, 0 piyasa geneli aday
-Oncelik seviyesi: yok
+Karar: Bugun orta oncelikli takip gerektiren olay var.
+Sonuc: Orta oncelikli olay var; haber detayi kontrol edilmeli.
+Akis: 2 haber, 2 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
+Oncelik seviyesi: orta (63/100)
 
 ## Onemli Olay Ozeti
-- Veri yok
+- PCILT: +0.775, oncelik 63/100, onem 0.68, medium | other | PC İLETİŞİM VE MEDYA HİZMETLERİ SANAYİ TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
 
 ## Aksiyon Ozeti
-Dagilim: aksiyon gerektiren olay yok
-- Veri yok
+Dagilim: 1 detay kontrol et
+- PCILT: detay kontrol et | oncelik 63/100 | pozitif +0.775 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.68; gecmise gore olagan.
 
 ## Gecmis Karsilastirma
-Ozet: Skor esigini asan hisse yok.
+Ozet: Bugunku esik ustu sinyaller gecmise gore olagan.
 - Veri yok
 
 ## En Iyi Hisseler
-- Veri yok
+- PCILT: +0.775 (1 haber)
 
 ## En Kotu Hisseler
 - Veri yok
 
 ## En Guclu Pozitif Haberler
-- Veri yok
+- PCILT: +0.775 | PC İLETİŞİM VE MEDYA HİZMETLERİ SANAYİ TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim
 
 ## En Guclu Negatif Haberler
 - Veri yok
