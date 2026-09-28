@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-09-27,PASEU,-0.18169463854179,1,8,0.08575694199499542,0.20475829781989574,0.22551143626997766,-0.2674515805367854,-1.3061818904747604,normal
