@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+66a83a38c8ad,PRKAB,PRKAB,TÜRK PRYSMİAN KABLO VE SİSTEMLERİ A.Ş. - Özel Durum Açıklaması (Genel),other,stock_specific,1,-0.2057,0.3336,0.2699,negative,weak,negative; weak; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1671077,22,aksiyon=zayif sinyal; guc=zayif; onem=0.27; gecmis=gecmise gore olagan

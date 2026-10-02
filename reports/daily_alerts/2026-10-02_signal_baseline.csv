@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-10-02,PRKAB,-0.205690368239461,1,5,-0.06867384164338777,0.1099513319895248,0.20556071794271336,-0.13701652659607322,-1.2461561321433283,normal
