@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-10-07,RAYSG,-0.248163751379849,1,7,-0.16669878255701884,0.1328060760066816,0.2595569101352971,-0.08146496882283016,-0.6134129647707653,normal
