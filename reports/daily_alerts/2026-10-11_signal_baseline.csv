@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-10-11,CASA,0.3911007649860448,1,5,0.04414593233115259,0.18230571596354866,0.27570167559894027,0.3469548326548922,1.9031484055292291,elevated
