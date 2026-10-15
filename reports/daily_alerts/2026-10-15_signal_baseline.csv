@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-10-15,METEN,0.7738425370920172,1,14,0.23316337862638686,0.3650655799832891,0.7738425370920172,0.5406791584656303,1.4810466615077214,normal

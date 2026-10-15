@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+f48466546cab,METEN,METEN,METGÜN ENERJİ YATIRIMLARI A.Ş. - Payların Geri Alınmasına İlişkin Bildirim,other,stock_specific,1,0.7738,0.8355,0.6827,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1682442,63,aksiyon=detay kontrol et; guc=orta; onem=0.68; gecmis=gecmise gore olagan
