@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-10-25,MPARK,-0.2205194478958392,1,12,-0.036444300193882596,0.08583186679054987,0.1901894932138898,-0.1840751477019566,-2.1446014701176623,unusual
