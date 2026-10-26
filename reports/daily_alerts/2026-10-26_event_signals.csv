@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+741bdd4cd2e0,OZYSR,OZYSR,ÖZYAŞAR TEL VE GALVANİZLEME SANAYİ A.Ş. - Payların Geri Alınmasına İlişkin Bildirim,other,stock_specific,1,0.8479,0.8893,0.7342,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1687052,78,aksiyon=detay kontrol et; guc=orta; onem=0.73; gecmis=gecmise gore sira disi
