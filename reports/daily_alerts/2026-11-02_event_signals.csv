@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+36ef8491a506,TABGD,TABGD,TAB GIDA SANAYİ VE TİCARET A.Ş. - Payların Geri Alınmasına İlişkin Bildirim,other,stock_specific,1,0.819,0.8612,0.7127,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1690376,65,aksiyon=detay kontrol et; guc=orta; onem=0.71; gecmis=gecmise gore olagan
