@@ -1,1 +1,2 @@
 event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+87976294bf99,TEKTU,TEKTU,TEK-ART İNŞAAT TİCARET TURİZM SANAYİ VE YATIRIMLAR A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim,other,stock_specific,1,0.6599,0.786,0.6101,positive,medium,positive; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1694526,60,aksiyon=detay kontrol et; guc=orta; onem=0.61; gecmis=gecmis veri az

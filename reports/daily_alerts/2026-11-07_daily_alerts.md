@@ -1,34 +1,34 @@
 # BIST Gunluk Sentiment Raporu - 2026-11-07
 
-Genel skor: +0.020 (notr), haber adedi: 5
+Genel skor: +0.075 (pozitif), haber adedi: 26
 Sinyal esigi: |skor| >= 0.20
-Bugun esigi asan anlamli haber/hisse sinyali yok.
+Bugun orta/guclu olay sinyali var.
 
 ## Gunluk Karar
-Karar: Bugun aksiyon gerektiren olay yok.
-Sonuc: Onemli olay yok; takip listesi bos.
-Akis: 5 haber, 1 hisse, 0 esik ustu hisse, 0 olay, 0 piyasa geneli aday
-Oncelik seviyesi: yok
+Karar: Bugun orta oncelikli takip gerektiren olay var.
+Sonuc: Orta oncelikli olay var; haber detayi kontrol edilmeli.
+Akis: 26 haber, 6 hisse, 1 esik ustu hisse, 1 olay, 0 piyasa geneli aday
+Oncelik seviyesi: orta (60/100)
 
 ## Onemli Olay Ozeti
-- Veri yok
+- TEKTU: +0.660, oncelik 60/100, onem 0.61, medium | other | TEK-ART İNŞAAT TİCARET TURİZM SANAYİ VE YATIRIMLAR A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim
 
 ## Aksiyon Ozeti
-Dagilim: aksiyon gerektiren olay yok
-- Veri yok
+Dagilim: 1 detay kontrol et
+- TEKTU: detay kontrol et | oncelik 60/100 | pozitif +0.660 | olay tipi net degil; haber detayi kontrol edilmeli; olay gucu orta, onem skoru 0.61; gecmis veri az.
 
 ## Gecmis Karsilastirma
-Ozet: Skor esigini asan hisse yok.
+Ozet: Esigi asan hisselerde yeterli gecmis veri yok.
 - Veri yok
 
 ## En Iyi Hisseler
-- Veri yok
+- TEKTU: +0.203 (3 haber)
 
 ## En Kotu Hisseler
 - Veri yok
 
 ## En Guclu Pozitif Haberler
-- Veri yok
+- TEKTU: +0.660 | TEK-ART İNŞAAT TİCARET TURİZM SANAYİ VE YATIRIMLAR A.Ş. - Kar Payı Dağıtım İşlemlerine İlişkin Bildirim
 
 ## En Guclu Negatif Haberler
 - Veri yok
