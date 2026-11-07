@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-07,EKGYO,0.0197910351503202,5,56,-0.03521178070758963,0.1453294574468291,0.12829835719861904,0.05500281585790983,0.378469835532369,normal
