@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-08,GLYHO,0.0533114383006852,3,36,0.4317923243613216,0.4410918794989915,0.8338806465292028,-0.3784808860606364,-0.8580545316103507,normal
