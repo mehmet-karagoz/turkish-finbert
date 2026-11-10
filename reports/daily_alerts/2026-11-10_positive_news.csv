@@ -1,0 +1,2 @@
+date,ticker,source,title,text,url,language,published_at,prob_negative,prob_neutral,prob_positive,prediction,sentiment_score,confidence,impact_score
+2026-11-10,TURSG,KAP,TÜRKİYE SİGORTA A.Ş. - Payların Geri Alınmasına İlişkin Bildirim,TÜRKİYE SİGORTA A.Ş. - Payların Geri Alınmasına İlişkin Bildirim. Payların Geri Alınmasına İlişkin Bildirim Günlük Pay Geri Alım İşlemleri,https://www.kap.org.tr/tr/Bildirim/1696183,tr,2026-11-10T06:37:14+00:00,0.0567446398427149,0.0683949360427384,0.8748604241145467,positive,0.8181157842718317,0.8748604241145467,0.8181157842718317
