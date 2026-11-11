@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-11,TCKRC,0.7879169810436094,1,22,0.22450118492701837,0.3335225663884653,0.7879169810436033,0.5634157961165911,1.689288380745911,elevated
