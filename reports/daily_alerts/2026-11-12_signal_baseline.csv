@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-12,SUWEN,0.7859204227937017,1,14,0.4195504767234017,0.424292894261001,0.8215329909107303,0.3663699460703,0.8634835770898627,normal
