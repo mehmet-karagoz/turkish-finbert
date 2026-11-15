@@ -1,0 +1,2 @@
+event_id,tickers,primary_ticker,title,event_type,market_scope,news_count,avg_impact_score,confidence,materiality_score,signal_direction,signal_strength,reason,url,priority_score,priority_reason
+ff250d6d6add,UMPAS,UMPAS,UMPAŞ HOLDİNG A.Ş. - Hak Kullanım Süreç İptal Bildirimi,other,stock_specific,1,-0.7002,0.8212,0.6393,negative,medium,negative; medium; other; stock_specific; 1 haber,https://www.kap.org.tr/tr/Bildirim/1698227,59,aksiyon=detay kontrol et; guc=orta; onem=0.64; gecmis=gecmise gore olagan
