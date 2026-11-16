@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-16,LKMNH,0.0297296700066128,3,32,0.4785943887243752,0.3592974481366276,0.7259563544360637,-0.4488647187177624,-1.2492844606763687,normal
