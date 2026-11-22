@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-22,ALKLC,0.1048209579127367,1,20,0.1075672542454336,0.23091015021156555,0.5506994524438439,-0.002746296332696907,-0.01189335475370261,normal
