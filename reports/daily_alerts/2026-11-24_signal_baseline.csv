@@ -1,0 +1,2 @@
+date,ticker,sentiment_score,news_count,history_days,baseline_mean,baseline_std,baseline_abs_p90,delta_from_mean,anomaly_z,anomaly_level
+2026-11-24,AZTEK,0.8246445502862625,1,19,0.43768004312571923,0.4123687809877676,0.8415627046007571,0.38696450716054326,0.9383942844403201,normal
